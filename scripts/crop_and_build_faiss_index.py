@@ -23,21 +23,29 @@ import cv2
 from transformers import CLIPProcessor, CLIPModel
 from ultralytics import YOLO
 import os
-
+from pathlib import Path
 # ===========================
 # 모델 로드
 # ===========================
 model_name = "openai/clip-vit-base-patch32"
 device = torch.device('cpu')
 clip_model = CLIPModel.from_pretrained(model_name).to(device)
-processor = CLIPProcessor.from_pretrained(model_name)
+processor = CLIPProcessor.from_pretrained(model_name,use_fast=False)
 
 yolo_model = YOLO("yolov8n-seg.pt")  # YOLOv8 segmentation 모델
 
 # ===========================
 # 경로 설정
 # ===========================
-image_dir = Path("../data/raw_images")
+image_dir = Path("C:/Users/dorot/EYEDIA_MODEL/data/raw_images")
+image_files = list(image_dir.glob("*.jpg"))
+print("📂 처리할 이미지 수:", len(image_files))
+print("📂 이미지 목록:", image_files)
+print("📁 image_dir가 가리키는 실제 경로:", image_dir.resolve())
+print("📁 해당 폴더 안에 있는 파일들:")
+for f in image_dir.resolve().iterdir():
+    print(" -", f.name)
+
 index_save_path = "../data/faiss/image_clip.index"
 meta_save_path = "../data/faiss/image_meta.json"
 crop_save_dir = Path("../data/cropped_images/")
@@ -57,7 +65,11 @@ def segment_and_crop(image_path: Path):
     results = yolo_model(image, conf=0.3)[0]
 
     if results.masks is None:
+        print(f"❌ YOLO가 객체를 감지하지 못함: {image_path.name}")
+
         return []
+    print(f"✅ 마스크 감지됨: {len(results.masks.data)}개")
+
 
     masks = results.masks.data.cpu().numpy()
     cropped_images = []
@@ -88,6 +100,8 @@ def segment_and_crop(image_path: Path):
             "crop_array": cropped_object,
             "crop_id": crop_filename
         })
+        
+    print(f"🔎 {image_path.name} YOLO 감지 시도 중...")
 
     return cropped_images
 
@@ -105,6 +119,8 @@ vectors = []
 meta_data = []
 
 image_files = list(image_dir.glob("*.jpg")) + list(image_dir.glob("*.jpeg")) + list(image_dir.glob("*.png"))
+print("📂 처리할 이미지 수:", len(image_files))
+print("📂 이미지 목록:", image_files)
 
 for img_file in image_files:
     print(f"🔍 {img_file.name} 처리 중...")

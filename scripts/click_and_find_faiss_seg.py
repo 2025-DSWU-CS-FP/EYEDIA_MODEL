@@ -8,6 +8,7 @@ from ultralytics import YOLO
 from transformers import CLIPProcessor, CLIPModel
 import json
 import os
+import openai  # 수정됨
 
 # ===========================
 # 모델 로드
@@ -18,30 +19,32 @@ clip_model = CLIPModel.from_pretrained(clip_model_name)
 clip_processor = CLIPProcessor.from_pretrained(clip_model_name)
 
 # FAISS 인덱스 로드
-index = faiss.read_index("../data/faiss/image_clip.index")
+index = faiss.read_index("data/faiss/image_clip.index")
 
-# ===========================
-# image_meta.json 로드
-# ===========================
-with open("../data/faiss/image_meta.json", "r") as f:
-    image_meta = json.load(f)
-
+# crop_id 설명 로드
+meta_paths = [
+    Path("data/faiss/image_meta.json"),
+    Path("data/faiss/image_en_meta.json")
+]
 crop_id_list = []
 crop_id_to_description = {}
-
-for entry in image_meta:
-    for crop in entry["crops"]:
-        crop_id_list.append(crop["crop_id"])
-        crop_id_to_description[crop["crop_id"]] = crop["crop_description"]
+for path in meta_paths:
+    with open(path, "r", encoding="utf-8") as f:
+        meta_data = json.load(f)
+        for entry in meta_data:
+            for crop in entry["crops"]:
+                crop_id = crop["crop_id"]
+                crop_id_list.append(crop_id)
+                crop_id_to_description[crop_id] = crop["crop_description"]
 
 # ===========================
-# 이미지 임베딩 함수 (PIL 이미지 입력)
+# 이미지 임베딩 함수
 # ===========================
 def image_embedding_from_pil(pil_img: Image.Image) -> np.ndarray:
     inputs = clip_processor(images=pil_img, return_tensors="pt")
     with torch.no_grad():
         emb = clip_model.get_image_features(**inputs)
-    emb = emb / emb.norm(dim=-1, keepdim=True)  # L2 정규화
+    emb = emb / emb.norm(dim=-1, keepdim=True)
     return emb.cpu().numpy().astype("float32")
 
 # ===========================
@@ -50,6 +53,14 @@ def image_embedding_from_pil(pil_img: Image.Image) -> np.ndarray:
 def search_similar_image(embedding: np.ndarray, index: faiss.Index, top_k=1):
     distances, indices = index.search(embedding, top_k)
     return distances, indices
+
+# ===========================
+# OpenAI 호환 Ollama 클라이언트 연결
+# ===========================
+client = openai.OpenAI(
+    base_url="http://localhost:11434/v1",
+    api_key="nokeyneeded"
+)
 
 # ===========================
 # 객체 탐지 및 클릭 이벤트 함수
@@ -100,14 +111,9 @@ def detect_and_interact(image_path: str):
                     print(f"🖱️ ({x}, {y}) → '{label}' 객체 클릭")
 
                     binary_mask = mask
-
-                    # 1. 마스크를 3채널로 변환
-                    binary_mask_3ch = np.stack([binary_mask]*3, axis=-1)
-
-                    # 2. 이미지와 곱해서 객체 부분만 남기고 배경은 흰색으로 채우기
+                    binary_mask_3ch = np.stack([binary_mask] * 3, axis=-1)
                     masked_image = np.where(binary_mask_3ch == 1, image, 255)
 
-                    # 3. 마스크 부분만 자르기
                     x_indices, y_indices = np.where(binary_mask == 1)
                     x_min, x_max = np.min(y_indices), np.max(y_indices)
                     y_min, y_max = np.min(x_indices), np.max(x_indices)
@@ -117,27 +123,36 @@ def detect_and_interact(image_path: str):
                         print("❗ 클릭한 객체가 너무 작습니다.")
                         return
 
-                    # 크롭한 객체 저장
                     save_path = f"cropped_objects/cropped_{x}_{y}.png"
                     cv2.imwrite(save_path, cropped_object)
                     print(f"📷 크롭된 객체 저장 완료: {save_path}")
 
                     pil_cropped = Image.fromarray(cv2.cvtColor(cropped_object, cv2.COLOR_BGR2RGB))
-
                     embedding = image_embedding_from_pil(pil_cropped)
                     distances, indices = search_similar_image(embedding, index)
 
-                    print(f"\n🔍 가장 유사한 이미지 인덱스: {indices[0][0]}")
-                    print(f"🔎 거리(유사도 점수): {distances[0][0]}")
+                    matched_crop_id = crop_id_list[indices[0][0]]
+                    description = crop_id_to_description.get(matched_crop_id, "설명 없음")
+                    print(f"📄 crop_id: {matched_crop_id}")
+                    print(f"📝 원문 설명: {description}")
 
-                    if indices[0][0] < len(crop_id_list):
-                        matched_crop_id = crop_id_list[indices[0][0]]
-                        description = crop_id_to_description.get(matched_crop_id, "설명 없음")
-                        print(f"📄 파일명: {matched_crop_id}")
-                        print(f"📝 설명: {description}")
-                    else:
-                        print("❗ 인덱스 범위를 벗어났습니다.")
-                    return
+                    try:
+                        phi_response = client.chat.completions.create(
+                            model="phi3:latest",
+                            temperature=0.7,
+                            messages=[
+                                {"role": "system", "content": "당신은 예술작품 설명을 도와주는 도슨트입니다. 한국어로 이 객체에 대해 설명해주세요."},
+                                {"role": "user", "content": f"{description}"}
+                            ]
+                        )
+                        refined_text = phi_response.choices[0].message.content
+                        print(f"🎨 정제된 설명 (phi3):\n{refined_text.strip()}")
+
+                    except Exception as e:
+                        print("❗ phi3 응답 실패:", e)
+
+                    return  # 객체를 찾고 나면 종료
+
             print(f"🖱️ ({x}, {y}) → 객체 없음")
 
     cv2.namedWindow("YOLOv8 Segmentation Click")
@@ -151,7 +166,7 @@ def detect_and_interact(image_path: str):
     cv2.destroyAllWindows()
 
 # ===========================
-# 실행 부분 -> 테스트 할 이미지 지정
+# 실행
 # ===========================
 if __name__ == "__main__":
-    detect_and_interact("../data/raw_images/image-7.jpg")
+    detect_and_interact("data/raw_images/image-7.jpg")
