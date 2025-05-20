@@ -37,7 +37,7 @@ yolo_model = YOLO("yolov8n-seg.pt")  # YOLOv8 segmentation 모델
 # ===========================
 # 경로 설정
 # ===========================
-image_dir = Path("../data/raw_images")
+image_dir = Path("data/raw_images")
 index_save_path = "../data/faiss/image_clip.index"
 meta_save_path = "../data/faiss/image_meta.json"
 crop_save_dir = Path("../data/cropped_images/")

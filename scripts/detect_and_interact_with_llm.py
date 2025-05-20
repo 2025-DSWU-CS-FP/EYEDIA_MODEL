@@ -5,19 +5,24 @@ import faiss
 from PIL import Image
 from pathlib import Path
 from ultralytics import YOLO
-from transformers import CLIPProcessor, CLIPModel
+from transformers import CLIPProcessor, CLIPModel, AutoTokenizer, AutoModelForCausalLM, pipeline
+from langchain_community.llms import HuggingFacePipeline
+from langchain.chains import LLMChain
+from langchain.prompts import PromptTemplate
 import json
 import os
 
 # ===========================
-# 모델 로드
+# YOLO 및 CLIP 모델 로드
 # ===========================
 yolo_model = YOLO("yolov8n-seg.pt")
 clip_model_name = "openai/clip-vit-base-patch32"
 clip_model = CLIPModel.from_pretrained(clip_model_name)
 clip_processor = CLIPProcessor.from_pretrained(clip_model_name)
 
+# ===========================
 # FAISS 인덱스 로드
+# ===========================
 index = faiss.read_index("data/faiss/image_clip.index")
 
 # ===========================
@@ -35,13 +40,53 @@ for entry in image_meta:
         crop_id_to_description[crop["crop_id"]] = crop["crop_description"]
 
 # ===========================
-# 이미지 임베딩 함수 (PIL 이미지 입력)
+# HuggingFace LLM (KULLM3) + MPS
+# ===========================
+model_name = "nlpai-lab/KULLM3"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+
+model = AutoModelForCausalLM.from_pretrained(
+    model_name,
+    torch_dtype=torch.float16,
+).to("cpu")
+
+hf_pipeline = pipeline(
+    "text-generation",
+    model=model,
+    tokenizer=tokenizer,
+    device="cpu",
+    max_new_tokens=256,
+    do_sample=True,
+    temperature=0.7,
+    top_p=0.95,
+    repetition_penalty=1.15
+)
+
+llm = HuggingFacePipeline(pipeline=hf_pipeline)
+
+prompt = PromptTemplate(
+    input_variables=["object_name", "position_description"],
+    template="""
+당신은 예술작품을 설명하는 도슨트입니다.
+다음 정보를 바탕으로 관람객에게 친절하게 설명해 주세요:
+
+- 객체 이름: {object_name}
+- 위치 및 묘사: {position_description}
+
+도슨트 설명:
+"""
+)
+
+chain = LLMChain(llm=llm, prompt=prompt)
+
+# ===========================
+# 이미지 임베딩 함수
 # ===========================
 def image_embedding_from_pil(pil_img: Image.Image) -> np.ndarray:
     inputs = clip_processor(images=pil_img, return_tensors="pt")
     with torch.no_grad():
         emb = clip_model.get_image_features(**inputs)
-    emb = emb / emb.norm(dim=-1, keepdim=True)  # L2 정규화
+    emb = emb / emb.norm(dim=-1, keepdim=True)
     return emb.cpu().numpy().astype("float32")
 
 # ===========================
@@ -52,7 +97,7 @@ def search_similar_image(embedding: np.ndarray, index: faiss.Index, top_k=1):
     return distances, indices
 
 # ===========================
-# 객체 탐지 및 클릭 이벤트 함수
+# 객체 탐지 및 클릭 인터랙션
 # ===========================
 def detect_and_interact(image_path: str):
     image = cv2.imread(image_path)
@@ -100,14 +145,9 @@ def detect_and_interact(image_path: str):
                     print(f"🖱️ ({x}, {y}) → '{label}' 객체 클릭")
 
                     binary_mask = mask
-
-                    # 1. 마스크를 3채널로 변환
                     binary_mask_3ch = np.stack([binary_mask]*3, axis=-1)
-
-                    # 2. 이미지와 곱해서 객체 부분만 남기고 배경은 흰색으로 채우기
                     masked_image = np.where(binary_mask_3ch == 1, image, 255)
 
-                    # 3. 마스크 부분만 자르기
                     x_indices, y_indices = np.where(binary_mask == 1)
                     x_min, x_max = np.min(y_indices), np.max(y_indices)
                     y_min, y_max = np.min(x_indices), np.max(x_indices)
@@ -117,13 +157,11 @@ def detect_and_interact(image_path: str):
                         print("❗ 클릭한 객체가 너무 작습니다.")
                         return
 
-                    # 크롭한 객체 저장
                     save_path = f"cropped_objects/cropped_{x}_{y}.png"
                     cv2.imwrite(save_path, cropped_object)
                     print(f"📷 크롭된 객체 저장 완료: {save_path}")
 
                     pil_cropped = Image.fromarray(cv2.cvtColor(cropped_object, cv2.COLOR_BGR2RGB))
-
                     embedding = image_embedding_from_pil(pil_cropped)
                     distances, indices = search_similar_image(embedding, index)
 
@@ -135,6 +173,16 @@ def detect_and_interact(image_path: str):
                         description = crop_id_to_description.get(matched_crop_id, "설명 없음")
                         print(f"📄 파일명: {matched_crop_id}")
                         print(f"📝 설명: {description}")
+
+                        try:
+                            print("\n🤖 도슨트 설명:")
+                            llm_response = chain.run({
+                                "object_name": label,
+                                "position_description": description
+                            })
+                            print(llm_response + "\n")
+                        except Exception as e:
+                            print("❗ LLM 실행 중 오류 발생:", e)
                     else:
                         print("❗ 인덱스 범위를 벗어났습니다.")
                     return
@@ -151,7 +199,7 @@ def detect_and_interact(image_path: str):
     cv2.destroyAllWindows()
 
 # ===========================
-# 실행 부분 -> 테스트 할 이미지 지정
+# 실행
 # ===========================
 if __name__ == "__main__":
     detect_and_interact("data/raw_images/image-7.jpg")
