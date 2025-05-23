@@ -10,7 +10,7 @@ import json
 #설정 
 #=============================
 
-## SERVICE_KEY="f7a04215-b2c7-4470-8f43-865f0cfd8755"
+## SERVICE_KEY=""
 URL = "http://api.kcisa.kr/openapi/service/rest/meta10/get20150041"
 PARAMS = {
     "serviceKey": SERVICE_KEY,
@@ -31,6 +31,7 @@ client = OpenAI(
     base_url ="http://localhost:11434/v1",
     api_key="ollama"
     
+
 
 )
 
