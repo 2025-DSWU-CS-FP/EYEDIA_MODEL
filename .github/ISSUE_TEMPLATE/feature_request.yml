@@ -1,0 +1,46 @@
+name: "Issue: Feature request"
+description: "해당 이슈 템플릿을 활용하여 이슈를 생성해 주세요."
+title: "구현하고 싶은 기능 설명"
+labels: []
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: "## 🚀 기능 설명\n<!-- 어떤 기능을 추가하거나 개선하고 싶은지 설명해주세요. -->"
+
+  - type: textarea
+    id: feature-description
+    attributes:
+      label: "기능 설명"
+      description: "어떤 기능을 추가하거나 개선하고 싶은지 자세히 작성해 주세요."
+      placeholder: "예: 사용자 로그인 시 리디렉션 기능 추가"
+    validations:
+      required: true
+
+  - type: input
+    id: deadline
+    attributes:
+      label: "⏰ 임시 데드라인"
+      description: "대략적인 완료 일자를 작성해 주세요."
+      placeholder: "예: 2025-06-01"
+    validations:
+      required: false
+
+  - type: textarea
+    id: reason
+    attributes:
+      label: "📌 필요 이유 (선택)"
+      description: "이 기능이 왜 필요한지, 어떤 문제를 해결할 수 있는지 설명해주세요."
+      placeholder: "예: 사용자 편의성을 높이기 위함"
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-info
+    attributes:
+      label: "📎 추가 내용 (선택)"
+      description: "스크린샷, 참고 링크, 기타 관련 정보가 있다면 추가해주세요."
+      placeholder: "예: https://example.com/feature-docs"
+    validations:
+      required: false
