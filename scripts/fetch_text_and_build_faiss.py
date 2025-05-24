@@ -1,98 +1,73 @@
-import requests
-import xml.etree.ElementTree as ET
-from openai import OpenAI
+import requests, json, faiss, os
 from sentence_transformers import SentenceTransformer
-import numpy as np
-import faiss
-import json
 
-#=============================
-#설정 
-#=============================
+def fetch_met_data():
+    os.makedirs("data/met_images", exist_ok=True)
+    os.makedirs("data/faiss", exist_ok=True)
 
-## SERVICE_KEY=""
-URL = "http://api.kcisa.kr/openapi/service/rest/meta10/get20150041"
-PARAMS = {
-    "serviceKey": SERVICE_KEY,
-    "numOfRows": "100",
-    "pageNo": "1"
-}
+    department_id = 11  # European Paintings
+    res = requests.get(f"https://collectionapi.metmuseum.org/public/collection/v1/objects?departmentIds={department_id}")
+    object_ids = res.json().get("objectIDs", [])[:10]
 
-FAISS_INDEX_PATH = "phi3_subject.index"
-META_JSON_PATH = "phi3_subject_meta.json"
+    embedder = SentenceTransformer("snunlp/KR-SBERT-V40K-klueNLI-augSTS")
+    texts, faiss_meta, json_records = [], [], []
 
+    for i, object_id in enumerate(object_ids):
+        obj = requests.get(f"https://collectionapi.metmuseum.org/public/collection/v1/objects/{object_id}").json()
+        if not obj.get("primaryImageSmall"):
+            continue  # 이미지 없는 경우 스킵
 
+        title = obj.get("title", "")
+        artist = obj.get("artistDisplayName", "")
+        date = obj.get("objectDate", "")
+        medium = obj.get("medium", "")
+        culture = obj.get("culture", "")
+        img_url = obj["primaryImageSmall"]
+        image_path = f"data/met_images/image_{i}.jpg"
 
-#==============================
-# 모델 설정
-#==============================
+        try:
+            with open(image_path, "wb") as f:
+                f.write(requests.get(img_url).content)
+        except:
+            continue
 
-client = OpenAI(
-    base_url ="http://localhost:11434/v1",
-    api_key="ollama"
-    
+        # 전체 설명 (FAISS 임베딩용)
+        summary = f"{title}. {artist}. {date}. {medium}. {culture}".strip()[:300]
+        texts.append(summary)
 
+        # FAISS 메타 저장용
+        faiss_meta.append({
+            "id": f"item_{i}",
+            "objectID": object_id,
+            "title": title,
+            "artist": artist,
+            "summary": summary,
+            "image_path": image_path
+        })
 
-)
+        # 사용자 정의 JSON 구조
+        json_records.append({
+            "img": image_path,
+            "작가": artist,
+            "배경설명": summary,
+            "객체들": []  # 실제 객체 감지는 후처리에서 채워야 함
+        })
 
-embedder =SentenceTransformer("snunlp/KR-SBERT-V40K-klueNLI-augSTS")
+        print(f"✅ [{i+1}] {title}")
 
-# ===========================
-# API 호출 및 XML 파싱
-# =========================== 
+    # FAISS 인덱스 저장
+    embeddings = embedder.encode(texts, convert_to_numpy=True, normalize_embeddings=True).astype("float32")
+    index = faiss.IndexFlatIP(embeddings.shape[1])
+    index.add(embeddings)
+    faiss.write_index(index, "data/faiss/met_text.index")
 
-response = requests.get(URL, params =PARAMS)
-response.encoding ="utf-8"
-root =ET.fromstring(response.text)
-items = root.findall(".//item")
+    # 메타 정보 저장 (기존 포맷)
+    with open("data/faiss/met_text_meta.json", "w", encoding="utf-8") as f:
+        json.dump(faiss_meta, f, indent=2, ensure_ascii=False)
 
-texts=[]
-meta =[]
+    # 새 JSON 구조 저장 (요청한 포맷)
+    with open("data/faiss/met_structured.json", "w", encoding="utf-8") as f:
+        json.dump(json_records, f, indent=2, ensure_ascii=False)
 
-for i, item in enumerate (items):
-    title = item.findtext("title","")
-    keyword = item.findtext("subjectKeywor","")
-    desc = item.findtext("description", "")
-    abstract = item.findtext("abstract", "")
-    
-
-    raw_text =f"{keyword}.{desc} {abstract}".strip()
-    if not raw_text:
-        continue
-
-    try:
-        res = client.chat.completions.create(
-            model="phi3:latest",
-            messages=[
-                {"role": "system", "content": "당신은 한국어 정보를 요약하는 도우미입니다."},
-                {"role": "user", "content": f"다음 내용을 핵심적으로 요약해줘:\n\n{raw_text}"}
-            ]
-        )
-        summary = res.choices[0].message.content.strip()
-    except Exception as e:
-        print(f"❗ phi3 요약 실패 ({i}):", e)
-        summary = raw_text[:200]
-
-    print(f"✅ [{i+1}] 요약 완료: {summary[:50]}...")
-    texts.append(summary)
-    meta.append({
-        "id": f"item_{i}",
-        "title": title,
-        "subjectKeyword": keyword,
-        "summary": summary
-    })
-
-# ===========================
-# 벡터 임베딩 + FAISS 저장
-# ===========================
-
-
-embeddings = embedder.encoder(texts, convert_to_numpy=True, normalize_embeddings=True).astype("float32")
-index = faiss.IndexFlatIP(embeddings.shape[1])
-
-index.add(embeddings)
-faiss.write_index(index, FAISS_INDEX_PATH)
-with open(META_JSON_PATH, "w", encoding="utf-8") as f:
-    json.dump(meta, f, indent=2, ensure_ascii=False)
-
-print(f"\n✅ 총 {len(texts)}개 항목 저장 완료 → {FAISS_INDEX_PATH}, {META_JSON_PATH}")
+if __name__ == "__main__":
+    fetch_met_data()
