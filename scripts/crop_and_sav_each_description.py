@@ -114,8 +114,8 @@ print("✅ image_data.json 저장 완료")
 
 # 8. FAISS 인덱스 및 image_meta.json 저장 (리스트 구조)
 os.makedirs("faiss", exist_ok=True)
-index_save_path = "./faiss/image_clip_v2.index"
-meta_save_path = "./faiss/image_meta_v2.json"
+index_save_path = "./data/faiss/image_clip_v2.index"
+meta_save_path = "./data/faiss/image_meta_v2.json"
 
 if clip_vectors:
     matrix = np.vstack(clip_vectors)
