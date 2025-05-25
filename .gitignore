@@ -1,3 +1,5 @@
-./data/met_images
-./data/faiss
-./data/croppe_images
+data/met_images
+data/faiss
+data/cropped_images
+scripts/api
+logs/
