@@ -1,0 +1,132 @@
+[
+  {
+    "crop_id": "image_0_crop0.jpg",
+    "original": "image_0.jpg",
+    "객체설명": "이 객체는 'person'으로 감지되었습니다."
+  },
+  {
+    "crop_id": "image_0_crop1.jpg",
+    "original": "image_0.jpg",
+    "객체설명": "이 객체는 'teddy bear'으로 감지되었습니다."
+  },
+  {
+    "crop_id": "image_0_crop2.jpg",
+    "original": "image_0.jpg",
+    "객체설명": "이 객체는 'person'으로 감지되었습니다."
+  },
+  {
+    "crop_id": "image_2_crop0.jpg",
+    "original": "image_2.jpg",
+    "객체설명": "이 객체는 'dog'으로 감지되었습니다."
+  },
+  {
+    "crop_id": "image_4_crop0.jpg",
+    "original": "image_4.jpg",
+    "객체설명": "이 객체는 'person'으로 감지되었습니다."
+  },
+  {
+    "crop_id": "image_4_crop1.jpg",
+    "original": "image_4.jpg",
+    "객체설명": "이 객체는 'person'으로 감지되었습니다."
+  },
+  {
+    "crop_id": "image_4_crop2.jpg",
+    "original": "image_4.jpg",
+    "객체설명": "이 객체는 'person'으로 감지되었습니다."
+  },
+  {
+    "crop_id": "image_4_crop3.jpg",
+    "original": "image_4.jpg",
+    "객체설명": "이 객체는 'person'으로 감지되었습니다."
+  },
+  {
+    "crop_id": "image_4_crop4.jpg",
+    "original": "image_4.jpg",
+    "객체설명": "이 객체는 'person'으로 감지되었습니다."
+  },
+  {
+    "crop_id": "image_4_crop5.jpg",
+    "original": "image_4.jpg",
+    "객체설명": "이 객체는 'person'으로 감지되었습니다."
+  },
+  {
+    "crop_id": "image_4_crop6.jpg",
+    "original": "image_4.jpg",
+    "객체설명": "이 객체는 'person'으로 감지되었습니다."
+  },
+  {
+    "crop_id": "image_4_crop7.jpg",
+    "original": "image_4.jpg",
+    "객체설명": "이 객체는 'person'으로 감지되었습니다."
+  },
+  {
+    "crop_id": "image_4_crop8.jpg",
+    "original": "image_4.jpg",
+    "객체설명": "이 객체는 'person'으로 감지되었습니다."
+  },
+  {
+    "crop_id": "image_4_crop9.jpg",
+    "original": "image_4.jpg",
+    "객체설명": "이 객체는 'person'으로 감지되었습니다."
+  },
+  {
+    "crop_id": "image_4_crop10.jpg",
+    "original": "image_4.jpg",
+    "객체설명": "이 객체는 'person'으로 감지되었습니다."
+  },
+  {
+    "crop_id": "image_4_crop11.jpg",
+    "original": "image_4.jpg",
+    "객체설명": "이 객체는 'person'으로 감지되었습니다."
+  },
+  {
+    "crop_id": "image_4_crop12.jpg",
+    "original": "image_4.jpg",
+    "객체설명": "이 객체는 'person'으로 감지되었습니다."
+  },
+  {
+    "crop_id": "image_6_crop0.jpg",
+    "original": "image_6.jpg",
+    "객체설명": "이 객체는 'person'으로 감지되었습니다."
+  },
+  {
+    "crop_id": "image_6_crop1.jpg",
+    "original": "image_6.jpg",
+    "객체설명": "이 객체는 'person'으로 감지되었습니다."
+  },
+  {
+    "crop_id": "image_6_crop2.jpg",
+    "original": "image_6.jpg",
+    "객체설명": "이 객체는 'person'으로 감지되었습니다."
+  },
+  {
+    "crop_id": "image_7_crop0.jpg",
+    "original": "image_7.jpg",
+    "객체설명": "이 객체는 'person'으로 감지되었습니다."
+  },
+  {
+    "crop_id": "image_7_crop1.jpg",
+    "original": "image_7.jpg",
+    "객체설명": "이 객체는 'person'으로 감지되었습니다."
+  },
+  {
+    "crop_id": "image_7_crop2.jpg",
+    "original": "image_7.jpg",
+    "객체설명": "이 객체는 'person'으로 감지되었습니다."
+  },
+  {
+    "crop_id": "image_7_crop3.jpg",
+    "original": "image_7.jpg",
+    "객체설명": "이 객체는 'dog'으로 감지되었습니다."
+  },
+  {
+    "crop_id": "image_8_crop0.jpg",
+    "original": "image_8.jpg",
+    "객체설명": "이 객체는 'boat'으로 감지되었습니다."
+  },
+  {
+    "crop_id": "image_9_crop0.jpg",
+    "original": "image_9.jpg",
+    "객체설명": "이 객체는 'boat'으로 감지되었습니다."
+  }
+]

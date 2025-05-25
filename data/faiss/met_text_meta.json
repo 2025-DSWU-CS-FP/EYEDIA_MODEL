@@ -1,0 +1,74 @@
+[
+  {
+    "id": "item_0",
+    "objectID": 436776,
+    "title": "The Dead Christ in the Tomb with Two Angels",
+    "artist": "Abraham Janssen van Nuyssen",
+    "summary": "The Dead Christ in the Tomb with Two Angels. Abraham Janssen van Nuyssen. ca. 1610. Oil on canvas.",
+    "image_path": "data/met_images/image_0.jpg"
+  },
+  {
+    "id": "item_1",
+    "objectID": 436777,
+    "title": "Admiral Adam Duncan (1731–1804)",
+    "artist": "Philip Jean",
+    "summary": "Admiral Adam Duncan (1731–1804). Philip Jean. . Ivory.",
+    "image_path": "data/met_images/image_1.jpg"
+  },
+  {
+    "id": "item_2",
+    "objectID": 436778,
+    "title": "Portrait of a Man",
+    "artist": "Philip Jean",
+    "summary": "Portrait of a Man. Philip Jean. . Ivory.",
+    "image_path": "data/met_images/image_2.jpg"
+  },
+  {
+    "id": "item_3",
+    "objectID": 436779,
+    "title": "Portrait of a Woman",
+    "artist": "James Jennings",
+    "summary": "Portrait of a Woman. James Jennings. probably early 1770s. Ivory.",
+    "image_path": "data/met_images/image_3.jpg"
+  },
+  {
+    "id": "item_5",
+    "objectID": 436781,
+    "title": "The Adoration of the Christ Child",
+    "artist": "Jan Joest of Kalkar",
+    "summary": "The Adoration of the Christ Child. Jan Joest of Kalkar. . Oil on wood.",
+    "image_path": "data/met_images/image_5.jpg"
+  },
+  {
+    "id": "item_6",
+    "objectID": 436782,
+    "title": "Capriccio with St. Paul's and Old London Bridge",
+    "artist": "Antonio Joli",
+    "summary": "Capriccio with St. Paul's and Old London Bridge. Antonio Joli. ca. 1745. Oil on canvas.",
+    "image_path": "data/met_images/image_6.jpg"
+  },
+  {
+    "id": "item_7",
+    "objectID": 436784,
+    "title": "Scene in a Courtyard",
+    "artist": "Ludolf de Jongh",
+    "summary": "Scene in a Courtyard. Ludolf de Jongh. early 1660s. Oil on canvas.",
+    "image_path": "data/met_images/image_7.jpg"
+  },
+  {
+    "id": "item_8",
+    "objectID": 436785,
+    "title": "Honfleur",
+    "artist": "Johan Barthold Jongkind",
+    "summary": "Honfleur. Johan Barthold Jongkind. 1865. Oil on canvas.",
+    "image_path": "data/met_images/image_8.jpg"
+  },
+  {
+    "id": "item_9",
+    "objectID": 436787,
+    "title": "The Pont Neuf",
+    "artist": "Johan Barthold Jongkind",
+    "summary": "The Pont Neuf. Johan Barthold Jongkind. 1849–50. Oil on canvas.",
+    "image_path": "data/met_images/image_9.jpg"
+  }
+]

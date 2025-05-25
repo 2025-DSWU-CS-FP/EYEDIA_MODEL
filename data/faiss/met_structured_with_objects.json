@@ -1,0 +1,114 @@
+[
+  {
+    "img": "data/met_images/image_0.jpg",
+    "작가": "Abraham Janssen van Nuyssen",
+    "배경설명": "The Dead Christ in the Tomb with Two Angels. Abraham Janssen van Nuyssen. ca. 1610. Oil on canvas.",
+    "객체들": [
+      {
+        "객체이미지": "data\\cropped_images\\image_0_crop0.jpg",
+        "객체설명": "이 객체는 'person'으로 감지되었습니다."
+      },
+      {
+        "객체이미지": "data\\cropped_images\\image_0_crop1.jpg",
+        "객체설명": "이 객체는 'teddy bear'으로 감지되었습니다."
+      },
+      {
+        "객체이미지": "data\\cropped_images\\image_0_crop2.jpg",
+        "객체설명": "이 객체는 'person'으로 감지되었습니다."
+      }
+    ]
+  },
+  {
+    "img": "data/met_images/image_1.jpg",
+    "작가": "Philip Jean",
+    "배경설명": "Admiral Adam Duncan (1731–1804). Philip Jean. . Ivory.",
+    "객체들": []
+  },
+  {
+    "img": "data/met_images/image_2.jpg",
+    "작가": "Philip Jean",
+    "배경설명": "Portrait of a Man. Philip Jean. . Ivory.",
+    "객체들": [
+      {
+        "객체이미지": "data\\cropped_images\\image_2_crop0.jpg",
+        "객체설명": "이 객체는 'dog'으로 감지되었습니다."
+      }
+    ]
+  },
+  {
+    "img": "data/met_images/image_3.jpg",
+    "작가": "James Jennings",
+    "배경설명": "Portrait of a Woman. James Jennings. probably early 1770s. Ivory.",
+    "객체들": []
+  },
+  {
+    "img": "data/met_images/image_5.jpg",
+    "작가": "Jan Joest of Kalkar",
+    "배경설명": "The Adoration of the Christ Child. Jan Joest of Kalkar. . Oil on wood.",
+    "객체들": []
+  },
+  {
+    "img": "data/met_images/image_6.jpg",
+    "작가": "Antonio Joli",
+    "배경설명": "Capriccio with St. Paul's and Old London Bridge. Antonio Joli. ca. 1745. Oil on canvas.",
+    "객체들": [
+      {
+        "객체이미지": "data\\cropped_images\\image_6_crop0.jpg",
+        "객체설명": "이 객체는 'person'으로 감지되었습니다."
+      },
+      {
+        "객체이미지": "data\\cropped_images\\image_6_crop1.jpg",
+        "객체설명": "이 객체는 'person'으로 감지되었습니다."
+      },
+      {
+        "객체이미지": "data\\cropped_images\\image_6_crop2.jpg",
+        "객체설명": "이 객체는 'person'으로 감지되었습니다."
+      }
+    ]
+  },
+  {
+    "img": "data/met_images/image_7.jpg",
+    "작가": "Ludolf de Jongh",
+    "배경설명": "Scene in a Courtyard. Ludolf de Jongh. early 1660s. Oil on canvas.",
+    "객체들": [
+      {
+        "객체이미지": "data\\cropped_images\\image_7_crop0.jpg",
+        "객체설명": "이 객체는 'person'으로 감지되었습니다."
+      },
+      {
+        "객체이미지": "data\\cropped_images\\image_7_crop1.jpg",
+        "객체설명": "이 객체는 'person'으로 감지되었습니다."
+      },
+      {
+        "객체이미지": "data\\cropped_images\\image_7_crop2.jpg",
+        "객체설명": "이 객체는 'person'으로 감지되었습니다."
+      },
+      {
+        "객체이미지": "data\\cropped_images\\image_7_crop3.jpg",
+        "객체설명": "이 객체는 'dog'으로 감지되었습니다."
+      }
+    ]
+  },
+  {
+    "img": "data/met_images/image_8.jpg",
+    "작가": "Johan Barthold Jongkind",
+    "배경설명": "Honfleur. Johan Barthold Jongkind. 1865. Oil on canvas.",
+    "객체들": [
+      {
+        "객체이미지": "data\\cropped_images\\image_8_crop0.jpg",
+        "객체설명": "이 객체는 'boat'으로 감지되었습니다."
+      }
+    ]
+  },
+  {
+    "img": "data/met_images/image_9.jpg",
+    "작가": "Johan Barthold Jongkind",
+    "배경설명": "The Pont Neuf. Johan Barthold Jongkind. 1849–50. Oil on canvas.",
+    "객체들": [
+      {
+        "객체이미지": "data\\cropped_images\\image_9_crop0.jpg",
+        "객체설명": "이 객체는 'boat'으로 감지되었습니다."
+      }
+    ]
+  }
+]
