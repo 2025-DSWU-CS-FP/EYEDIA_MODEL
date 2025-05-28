@@ -2,7 +2,6 @@
   {
     "full_image_id": 435627,
     "full_image_description": "In the Sun. Charles-Edouard de Beaumont. 1875. Oil on canvas.",
-    "author": "Charles-Edouard de Beaumont",
     "crops": [
       {
         "crop_id": "image_435627_crop1.jpg",
@@ -29,7 +28,6 @@
   {
     "full_image_id": 435630,
     "full_image_description": "Edward Miles (1752–1828). Sir William Beechey. . Oil on canvas.",
-    "author": "Sir William Beechey",
     "crops": [
       {
         "crop_id": "image_435630_crop1.jpg",
@@ -44,7 +42,6 @@
   {
     "full_image_id": 435631,
     "full_image_description": "George IV (1762–1830), When Prince of Wales. Sir William Beechey. . Oil on canvas.",
-    "author": "Sir William Beechey",
     "crops": [
       {
         "crop_id": "image_435631_crop1.jpg",
@@ -55,7 +52,6 @@
   {
     "full_image_id": 435632,
     "full_image_description": "Portrait of a Woman. Sir William Beechey. ca. 1805. Oil on canvas.",
-    "author": "Sir William Beechey",
     "crops": [
       {
         "crop_id": "image_435632_crop1.jpg",
@@ -70,7 +66,6 @@
   {
     "full_image_id": 435633,
     "full_image_description": "Skating at Sloten, near Amsterdam. Johannes Abrahamsz Beerstraten. . Oil on canvas.",
-    "author": "Johannes Abrahamsz Beerstraten",
     "crops": [
       {
         "crop_id": "image_435633_crop1.jpg",
@@ -129,7 +124,6 @@
   {
     "full_image_id": 435634,
     "full_image_description": "Miss Chambers. Isabella Beetham. after 1782. Ivory.",
-    "author": "Isabella Beetham",
     "crops": [
       {
         "crop_id": "image_435634_crop1.jpg",
@@ -140,7 +134,6 @@
   {
     "full_image_id": 435635,
     "full_image_description": "Chancellor Leonhard von Eck (1480–1550). Barthel Beham. 1527. Oil on spruce.",
-    "author": "Barthel Beham",
     "crops": [
       {
         "crop_id": "image_435635_crop1.jpg",
@@ -151,19 +144,16 @@
   {
     "full_image_id": 435636,
     "full_image_description": "Portrait of a Woman. Rudolphe Bel. 1822. Paper stretched over metal.",
-    "author": "Rudolphe Bel",
     "crops": []
   },
   {
     "full_image_id": 435637,
     "full_image_description": "Charles de Saint-Radegonde, called Charles Coguin, Abbot of Anchin. Jean Bellegambe. ca. 1511–20. Oil on wood.",
-    "author": "Jean Bellegambe",
     "crops": []
   },
   {
     "full_image_id": 435638,
     "full_image_description": "The Cellier Altarpiece. Jean Bellegambe. 1511–12. Oil on wood.",
-    "author": "Jean Bellegambe",
     "crops": [
       {
         "crop_id": "image_435638_crop1.jpg",

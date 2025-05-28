@@ -1,4 +1,7 @@
-import os, json, cv2, numpy as np
+import os
+import json
+import cv2
+import numpy as np
 from PIL import Image
 from pathlib import Path
 import torch
@@ -7,23 +10,42 @@ from ultralytics import YOLO
 from sentence_transformers import SentenceTransformer, util
 
 def crop_and_update_structured():
-    # 경로 설정
-    image_dir = Path("./data/met_images")
-    crop_dir = Path("./data/cropped_images")
-    faiss_dir = Path("./data/faiss")
-    structured_path = faiss_dir / "met_structured.json"
+    # 📂 경로 설정
+    image_dir = Path("data/met_images")
+    crop_dir = Path("data/cropped_images")
+    faiss_dir = Path("data/faiss")
+    structured_path = faiss_dir / "met_structured_with_objects.json"
     output_path = faiss_dir / "met_structured_with_objects.json"
 
+    # 📁 폴더 없으면 생성
+    image_dir.mkdir(parents=True, exist_ok=True)
     crop_dir.mkdir(parents=True, exist_ok=True)
+    faiss_dir.mkdir(parents=True, exist_ok=True)
 
-    # 모델 로딩
-    yolo = YOLO("yolov8n-seg.pt")
-    sbert = SentenceTransformer("snunlp/KR-SBERT-V40K-klueNLI-augSTS")
+    # 📄 메타데이터 없으면 빈 구조 생성
+    if not structured_path.exists():
+        print(f"📄 {structured_path} 파일이 없어 기본 템플릿 생성")
+        with open(structured_path, "w", encoding="utf-8") as f:
+            json.dump([], f, indent=2, ensure_ascii=False)
 
-    # 메타 데이터 로딩
+    # 🧠 모델 로딩
+    print("🔄 모델 불러오는 중...")
+    try:
+        yolo = YOLO("yolov8n-seg.pt")
+        sbert = SentenceTransformer("snunlp/KR-SBERT-V40K-klueNLI-augSTS")
+    except Exception as e:
+        print(f"❌ 모델 로딩 실패: {e}")
+        return
+
+    # 📖 메타 데이터 로딩
     with open(structured_path, "r", encoding="utf-8") as f:
         structured_data = json.load(f)
 
+    if not structured_data:
+        print("⚠️ 메타데이터가 비어 있습니다. crop 생성 없이 종료됩니다.")
+        return
+
+    # 🔍 이미지별 처리
     for item in structured_data:
         full_image_id = item["full_image_id"]
         img_path = image_dir / f"image_{full_image_id}.jpg"
@@ -39,12 +61,17 @@ def crop_and_update_structured():
             continue
 
         description_sentences = [s.strip() for s in full_desc_text.replace("**", "").split(".") if s.strip()]
+        if not description_sentences:
+            print(f"❗ 설명 문장이 없음: {full_image_id}")
+            continue
+
         sentence_embeddings = sbert.encode(description_sentences, convert_to_tensor=True)
 
         img_resized = cv2.resize(img, (1280, 720))
         results = yolo(img_resized, conf=0.3)[0]
 
         if not results.masks:
+            print(f"⚠️ 객체 감지 실패: {full_image_id}")
             continue
 
         item["crops"] = []
@@ -74,14 +101,13 @@ def crop_and_update_structured():
             crop_path = crop_dir / crop_name
             cv2.imwrite(str(crop_path), cropped)
 
-            description = description_map[label]
-
+            description = description_map.get(label, "")
             item["crops"].append({
                 "crop_id": crop_name,
                 "crop_description": description
             })
 
-    # 결과 저장
+    # 💾 결과 저장
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(structured_data, f, indent=2, ensure_ascii=False)
 
