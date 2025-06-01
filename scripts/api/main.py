@@ -1,21 +1,29 @@
+import os
+import json
+import subprocess
+import re
+from typing import Set
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import requests
-import subprocess
-import os
-import json
+import google.generativeai as genai
+from dotenv import load_dotenv
 
+load_dotenv()  # .env에서 환경변수 로딩
 app = FastAPI()
 
-# Spring 서버 주소 (예: Spring Boot Controller)
+# Spring 서버 주소
 BACKEND_VALIDATION_URL = "http://localhost:8080/api/vi/ai/painting-id"
-BACKEND_RESPONSE_URL = "http://localhost:8080/api/vi/ai/object-description"  # 실제 Spring 엔드포인트
-ACCESS_TOKEN = ""  # 실제 토큰으로 대체
+BACKEND_RESPONSE_URL = "http://localhost:8080/api/vi/ai/object-description"
+ACCESS_TOKEN = os.getenv("ACCESS_TOKEN") or ""  # 실제 토큰
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
-# 최초 스크립트 실행 여부 저장
-initialized_images = set()
+if not GEMINI_API_KEY:
+    raise RuntimeError("GEMINI_API_KEY가 .env 파일에 설정되지 않았습니다.")
 
-# JSON 구조 데이터 경로
+genai.configure(api_key=GEMINI_API_KEY)
+initialized_images: Set[str] = set()
 STRUCTURE_PATH = "data/met_structure_with_objects.json"
 
 # 요청 DTO
@@ -26,7 +34,23 @@ class AnalyzeClickRequest(BaseModel):
     image_id: str
     click_index: int = 0
 
-# paintingId 유효성 확인
+class DescriptionRequest(BaseModel):
+    crop_description: str
+
+def get_docent_description_from_text(crop_description: str) -> str:
+    try:
+        model = genai.GenerativeModel("models/gemini-2.0-flash")
+        prompt = (
+            "당신은 미술관의 도슨트입니다. 아래 설명을 바탕으로 관람객에게 친절하게 설명해주세요. "
+            "너무 딱딱하거나 기술적이지 않게 풀어서 말해주세요.\n\n"
+            f"[작품 설명]: {crop_description}\n\n"
+            "→ 도슨트 스타일로 설명해주세요:"
+        )
+        response = model.generate_content(prompt)
+        return response.text.strip()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Gemini 도슨트 설명 생성 실패: {e}")
+
 @app.post("/validate/painting-id")
 def validate_painting_id(req: ValidateRequest):
     try:
@@ -36,12 +60,11 @@ def validate_painting_id(req: ValidateRequest):
             headers={"Authorization": ACCESS_TOKEN}
         )
         if response.status_code != 200:
-            raise HTTPException(status_code=400, detail=" Spring 서버에서 paintingId 유효하지 않음")
+            raise HTTPException(status_code=400, detail="Spring 서버에서 paintingId 유효하지 않음")
         return {"status": "valid"}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f" Spring 요청 실패: {e}")
+        raise HTTPException(status_code=500, detail=f"Spring 요청 실패: {e}")
 
-# 클릭 분석 및 crop 설명 추출
 @app.post("/analyze/click")
 def analyze_click(req: AnalyzeClickRequest):
     full_image_id = f"image_{req.image_id}"
@@ -49,11 +72,9 @@ def analyze_click(req: AnalyzeClickRequest):
     crop_id = f"{full_image_id}_crop{req.click_index}.jpg"
     crop_path = f"data/cropped_images/{crop_id}"
 
-    # 원본 이미지 확인
     if not os.path.exists(image_path):
         raise HTTPException(status_code=404, detail=f"원본 이미지 없음: {image_path}")
 
-    #  최초 요청: 스크립트 실행
     if req.image_id not in initialized_images:
         try:
             subprocess.run(["python", "scripts/fetch_text_and_build_faiss.py"], check=True)
@@ -63,11 +84,9 @@ def analyze_click(req: AnalyzeClickRequest):
         except subprocess.CalledProcessError as e:
             raise HTTPException(status_code=500, detail=f"❌ 스크립트 실행 실패: {e}")
 
-    # crop 이미지 존재 확인
     if not os.path.exists(crop_path):
-        raise HTTPException(status_code=404, detail=f" Crop 이미지 없음: {crop_path}")
+        raise HTTPException(status_code=404, detail=f"Crop 이미지 없음: {crop_path}")
 
-    # crop_description 로딩
     try:
         with open(STRUCTURE_PATH, "r", encoding="utf-8") as f:
             all_data = json.load(f)
@@ -81,11 +100,16 @@ def analyze_click(req: AnalyzeClickRequest):
                         break
                 break
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f" 설명 추출 실패: {e}")
+        raise HTTPException(status_code=500, detail=f"설명 추출 실패: {e}")
 
-    #  Spring 서버로 전송
+    # ⚠️ 안전하게 paintingId 변환
+    try:
+        painting_id = int(re.sub(r"\D", "", req.image_id))  # "435638"
+    except:
+        raise HTTPException(status_code=400, detail="image_id에서 paintingId 추출 실패")
+
     result_payload = {
-        "paintingId": int(req.image_id),  # Spring에서 paintingId로 받는다고 가정
+        "paintingId": painting_id,
         "cropId": crop_id,
         "description": matched_description
     }
@@ -98,13 +122,18 @@ def analyze_click(req: AnalyzeClickRequest):
     if response.status_code != 200:
         raise HTTPException(
             status_code=response.status_code,
-            detail=f" Spring 전송 실패: {response.status_code} {response.text}"
+            detail=f"Spring 전송 실패: {response.status_code} {response.text}"
         )
 
-    #  최종 응답
     return {
         "status": "ok",
         "crop_id": crop_id,
         "description": matched_description,
         "backend_response": response.json()
     }
+
+# ✅ Gemini 설명 생성 테스트 엔드포인트
+@app.post("/test/gemini")
+def test_gemini(req: DescriptionRequest):
+    result = get_docent_description_from_text(req.crop_description)
+    return {"docent_description": result}
