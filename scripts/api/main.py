@@ -132,7 +132,7 @@ def analyze_click(req: AnalyzeClickRequest):
         "backend_response": response.json()
     }
 
-# ✅ Gemini 설명 생성 테스트 엔드포인트
+# ✅ Gemini 설명 생성 테스트 엔드포인트 -- 테스트용이므로 잘 개발되면 이 코드 지워주세요
 @app.post("/test/gemini")
 def test_gemini(req: DescriptionRequest):
     result = get_docent_description_from_text(req.crop_description)
