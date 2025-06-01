@@ -1,8 +1,4 @@
-./data/faiss
-./data/cropped_images/*
-./scripts/api
 ./logs/
-*.jpg
 *.png
 data/cropped_images/
 *.pt
