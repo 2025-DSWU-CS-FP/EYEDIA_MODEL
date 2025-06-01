@@ -1,18 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Apr 30 11:46:21 2025
-
-@author: kangchaewon
-"""
-
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Apr 28 15:57:21 2025
-@author: kangchaewon
-"""
-
 from pathlib import Path
 from PIL import Image
 import numpy as np

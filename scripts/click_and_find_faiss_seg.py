@@ -1,157 +1,148 @@
-import cv2
-import numpy as np
-import torch
-import faiss
+import cv2, json, numpy as np, torch, faiss, os, re
 from PIL import Image
-from pathlib import Path
 from ultralytics import YOLO
 from transformers import CLIPProcessor, CLIPModel
-import json
-import os
+from pathlib import Path
+import requests
 
-# ===========================
-# 모델 로드
-# ===========================
-yolo_model = YOLO("yolov8n-seg.pt")
-clip_model_name = "openai/clip-vit-base-patch32"
-clip_model = CLIPModel.from_pretrained(clip_model_name)
-clip_processor = CLIPProcessor.from_pretrained(clip_model_name)
+BACKEND_URL = "http://localhost:8080/api/model/response"  # Spring Boot 백엔드 URL
 
-# FAISS 인덱스 로드
-index = faiss.read_index("data/faiss/image_clip.index")
+def generate_met_image_meta_from_structured():
+    structured_path = Path("./data/faiss/met_structured_with_objects.json")
+    image_index_path = Path("./data/faiss/met_image.index")
+    output_path = Path("./data/faiss/met_image_meta.json")
 
-# ===========================
-# image_meta.json 로드
-# ===========================
-with open("data/faiss/image_meta.json", "r") as f:
-    image_meta = json.load(f)
+    if not structured_path.exists():
+        raise FileNotFoundError(f"❗ met_structured_with_objects.json 파일이 없습니다: {structured_path}")
 
-crop_id_list = []
-crop_id_to_description = {}
+    with open(structured_path, "r", encoding="utf-8") as f:
+        structured_data = json.load(f)
 
-for entry in image_meta:
-    for crop in entry["crops"]:
-        crop_id_list.append(crop["crop_id"])
-        crop_id_to_description[crop["crop_id"]] = crop["crop_description"]
+    meta = []
+    for item in structured_data:
+        full_id = str(item["full_image_id"])
+        match = re.search(r'(\d+)', full_id)
+        image_id = match.group(1) if match else full_id
+        for crop in item.get("crops", []):
+            meta.append({
+                "crop_id": crop["crop_id"],
+                "crop_description": crop["crop_description"],
+                "id": f"item_{image_id}"
+            })
 
-# ===========================
-# 이미지 임베딩 함수 (PIL 이미지 입력)
-# ===========================
-def image_embedding_from_pil(pil_img: Image.Image) -> np.ndarray:
-    inputs = clip_processor(images=pil_img, return_tensors="pt")
-    with torch.no_grad():
-        emb = clip_model.get_image_features(**inputs)
-    emb = emb / emb.norm(dim=-1, keepdim=True)  # L2 정규화
-    return emb.cpu().numpy().astype("float32")
+    with open(output_path, "w", encoding="utf-8") as f:
+        json.dump(meta, f, indent=2, ensure_ascii=False)
 
-# ===========================
-# 유사 이미지 검색 함수
-# ===========================
-def search_similar_image(embedding: np.ndarray, index: faiss.Index, top_k=1):
-    distances, indices = index.search(embedding, top_k)
-    return distances, indices
+    print(f"✅ met_image_meta.json 생성 완료 ({len(meta)}개 객체)")
 
-# ===========================
-# 객체 탐지 및 클릭 이벤트 함수
-# ===========================
-def detect_and_interact(image_path: str):
+    if not image_index_path.exists():
+        print("⚠️ met_image.index가 없어 빈 인덱스를 생성합니다.")
+        dummy_index = faiss.IndexFlatIP(512)
+        faiss.write_index(dummy_index, str(image_index_path))
+        print("✅ 빈 met_image.index 생성 완료")
+
+def run(image_path):
+    assert os.path.exists(image_path), "❗ 이미지 파일이 존재하지 않습니다"
+
+    yolo = YOLO("yolov8n-seg.pt")
+    clip = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
+    processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32", use_fast=True)
+
+    base_dir = "./data/faiss"
+    image_meta_path = f"{base_dir}/met_image_meta.json"
+    index_path = f"{base_dir}/met_image.index"
+
+    for path in [image_meta_path, index_path]:
+        if not os.path.exists(path):
+            raise FileNotFoundError(f"❗ 필수 파일이 없습니다: {path}")
+
+    index = faiss.read_index(index_path)
+    with open(image_meta_path, "r", encoding="utf-8") as f:
+        crop_meta = json.load(f)
+
+    def embed(img):
+        inputs = processor(images=img, return_tensors="pt")
+        with torch.no_grad():
+            emb = clip.get_image_features(**inputs)
+        return emb / emb.norm(dim=-1, keepdim=True)
+
     image = cv2.imread(image_path)
     if image is None:
-        raise FileNotFoundError(f"이미지를 불러올 수 없습니다: {image_path}")
+        raise FileNotFoundError(f"❗ 이미지 로드 실패: {image_path}")
+    image = cv2.resize(image, (1280, 720))
 
-    screen_width, screen_height = 1280, 720
-    image = cv2.resize(image, (screen_width, screen_height))
-
-    results = yolo_model(image, conf=0.3)[0]
-    class_names = yolo_model.names
-
-    if results.masks is None:
-        print("❗ 객체가 감지되지 않았습니다.")
-        return
-
-    masks = results.masks.data.cpu().numpy()
-    classes = results.boxes.cls.cpu().numpy().astype(int)
-
-    np.random.seed(42)
-    colors = np.random.randint(0, 255, size=(len(class_names), 3), dtype=np.uint8)
+    results = yolo(image, conf=0.3)[0]
+    masks = results.masks.data.cpu().numpy() if results.masks else []
 
     seg_image = image.copy()
-    object_regions = []
+    resized_masks = []
 
     for i, mask in enumerate(masks):
-        class_id = classes[i]
-        color = colors[class_id]
-        binary_mask = (mask > 0.5).astype(np.uint8)
-        binary_mask = cv2.resize(binary_mask, (image.shape[1], image.shape[0]))
+        bin_mask = (mask > 0.1).astype(np.uint8)
+        bin_mask = cv2.resize(bin_mask, (image.shape[1], image.shape[0]), interpolation=cv2.INTER_NEAREST)
+        resized_masks.append(bin_mask)
 
-        colored_mask = np.zeros_like(image, dtype=np.uint8)
+        color = np.random.randint(0, 255, (3,), dtype=np.uint8)
+        overlay = np.zeros_like(image, dtype=np.uint8)
         for c in range(3):
-            colored_mask[:, :, c] = binary_mask * color[c]
+            overlay[:, :, c] = bin_mask * color[c]
 
-        seg_image = cv2.addWeighted(seg_image, 1.0, colored_mask, 0.5, 0)
-        object_regions.append((binary_mask, class_names[class_id]))
+        seg_image = cv2.addWeighted(seg_image, 1.0, overlay, 0.4, 0)
 
-    os.makedirs("cropped_objects", exist_ok=True)
-
-    def on_mouse(event, x, y, flags, param):
-        if event == cv2.EVENT_LBUTTONDOWN:
-            for mask, label in object_regions:
-                if mask[y, x] == 1:
-                    print(f"🖱️ ({x}, {y}) → '{label}' 객체 클릭")
-
-                    binary_mask = mask
-
-                    # 1. 마스크를 3채널로 변환
-                    binary_mask_3ch = np.stack([binary_mask]*3, axis=-1)
-
-                    # 2. 이미지와 곱해서 객체 부분만 남기고 배경은 흰색으로 채우기
-                    masked_image = np.where(binary_mask_3ch == 1, image, 255)
-
-                    # 3. 마스크 부분만 자르기
-                    x_indices, y_indices = np.where(binary_mask == 1)
-                    x_min, x_max = np.min(y_indices), np.max(y_indices)
-                    y_min, y_max = np.min(x_indices), np.max(x_indices)
-                    cropped_object = masked_image[y_min:y_max, x_min:x_max]
-
-                    if cropped_object.size == 0:
-                        print("❗ 클릭한 객체가 너무 작습니다.")
+    def on_touch(event, x, y, flags, param):
+        if event in [cv2.EVENT_LBUTTONDOWN, cv2.EVENT_LBUTTONUP]:
+            print(f"📱 터치 위치: ({x}, {y})")
+            h, w = seg_image.shape[:2]
+            patch_size = 10
+            for i, bin_mask in enumerate(resized_masks):
+                x_min = max(x - patch_size, 0)
+                x_max = min(x + patch_size, w)
+                y_min = max(y - patch_size, 0)
+                y_max = min(y + patch_size, h)
+                patch = bin_mask[y_min:y_max, x_min:x_max]
+                if np.any(patch == 1):
+                    ys, xs = np.where(bin_mask == 1)
+                    if ys.size == 0 or xs.size == 0:
+                        print("❗ 마스크 비어 있음")
                         return
 
-                    # 크롭한 객체 저장
-                    save_path = f"cropped_objects/cropped_{x}_{y}.png"
-                    cv2.imwrite(save_path, cropped_object)
-                    print(f"📷 크롭된 객체 저장 완료: {save_path}")
+                    print("✅ 객체 클릭 인식됨")
+                    cv2.circle(seg_image, (x, y), 10, (0, 255, 0), 2)
+                    cv2.putText(seg_image, "✅ 객체 인식됨", (x + 15, y), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
 
-                    pil_cropped = Image.fromarray(cv2.cvtColor(cropped_object, cv2.COLOR_BGR2RGB))
+                    crop = image[np.min(ys):np.max(ys), np.min(xs):np.max(xs)]
+                    pil = Image.fromarray(cv2.cvtColor(crop, cv2.COLOR_BGR2RGB))
+                    emb = embed(pil).cpu().numpy().astype("float32")
+                    _, idx = index.search(emb, 1)
 
-                    embedding = image_embedding_from_pil(pil_cropped)
-                    distances, indices = search_similar_image(embedding, index)
+                    matched_crop_id = crop_meta[idx[0][0]]['crop_id']
+                    matched_crop = next((c for c in crop_meta if c['crop_id'] == matched_crop_id), None)
+                    description = matched_crop.get("crop_description", "설명 없음") if matched_crop else "crop_id 매칭 실패"
 
-                    print(f"\n🔍 가장 유사한 이미지 인덱스: {indices[0][0]}")
-                    print(f"🔎 거리(유사도 점수): {distances[0][0]}")
+                    print(f"\n🎯 crop_id: {matched_crop_id}")
+                    print(f"📄 설명:\n{description}")
 
-                    if indices[0][0] < len(crop_id_list):
-                        matched_crop_id = crop_id_list[indices[0][0]]
-                        description = crop_id_to_description.get(matched_crop_id, "설명 없음")
-                        print(f"📄 파일명: {matched_crop_id}")
-                        print(f"📝 설명: {description}")
-                    else:
-                        print("❗ 인덱스 범위를 벗어났습니다.")
+                    try:
+                        payload = {
+                            "full_image_id": Path(image_path).stem,
+                            "crop_id": matched_crop_id,
+                            "description": description
+                        }
+                        res = requests.post(BACKEND_URL, json=payload)
+                        print(f"✅ 백엔드 전송 완료: {res.status_code} {res.text}")
+                    except Exception as e:
+                        print(f"❗ 백엔드 전송 오류: {e}")
                     return
-            print(f"🖱️ ({x}, {y}) → 객체 없음")
+            print("❌ 터치한 위치에 감지된 객체가 없습니다.")
 
-    cv2.namedWindow("YOLOv8 Segmentation Click")
-    cv2.setMouseCallback("YOLOv8 Segmentation Click", on_mouse)
-
+    cv2.namedWindow("met viewer")
+    cv2.setMouseCallback("met viewer", on_touch)
     while True:
-        cv2.imshow("YOLOv8 Segmentation Click", seg_image)
+        cv2.imshow("met viewer", seg_image)
         if cv2.waitKey(1) & 0xFF == 27:
             break
-
     cv2.destroyAllWindows()
 
-# ===========================
-# 실행 부분 -> 테스트 할 이미지 지정
-# ===========================
 if __name__ == "__main__":
-    detect_and_interact("data/raw_images/image-7.jpg")
+    generate_met_image_meta_from_structured()
+    run("data/met_images/image_435638.jpg")
