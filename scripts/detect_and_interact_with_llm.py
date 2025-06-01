@@ -5,30 +5,38 @@ import faiss
 from PIL import Image
 from pathlib import Path
 from ultralytics import YOLO
-from transformers import CLIPProcessor, CLIPModel, AutoTokenizer, AutoModelForCausalLM, pipeline
-from langchain_community.llms import HuggingFacePipeline
-from langchain.chains import LLMChain
-from langchain.prompts import PromptTemplate
+from transformers import CLIPProcessor, CLIPModel
 import json
 import os
+import time
+import google.generativeai as genai
+from dotenv import load_dotenv
+
+# ===========================
+# 환경 변수에서 Gemini API 키 불러오기
+# ===========================
+load_dotenv()  # .env 파일에서 환경변수 불러오기
+api_key = os.getenv("GEMINI_API_KEY")
+if not api_key:
+    raise ValueError("❗ 환경 변수 'GEMINI_API_KEY'가 설정되지 않았습니다.")
+
+genai.configure(api_key=api_key)
+gemini_model = genai.GenerativeModel("models/gemini-2.0-flash")
 
 # ===========================
 # YOLO 및 CLIP 모델 로드
 # ===========================
 yolo_model = YOLO("yolov8n-seg.pt")
 clip_model_name = "openai/clip-vit-base-patch32"
-clip_model = CLIPModel.from_pretrained(clip_model_name)
+clip_model = CLIPModel.from_pretrained(clip_model_name).to("cuda")
 clip_processor = CLIPProcessor.from_pretrained(clip_model_name)
 
 # ===========================
-# FAISS 인덱스 로드
+# FAISS 인덱스 및 메타정보 로드
 # ===========================
 index = faiss.read_index("data/faiss/image_clip.index")
 
-# ===========================
-# image_meta.json 로드
-# ===========================
-with open("data/faiss/image_meta.json", "r") as f:
+with open("data/faiss/image_meta.json", "r", encoding="utf-8") as f:
     image_meta = json.load(f)
 
 crop_id_list = []
@@ -40,50 +48,20 @@ for entry in image_meta:
         crop_id_to_description[crop["crop_id"]] = crop["crop_description"]
 
 # ===========================
-# HuggingFace LLM (KULLM3) + MPS
+# 도슨트 설명 생성 함수 (Gemini 기반)
 # ===========================
-model_name = "nlpai-lab/KULLM3"
-tokenizer = AutoTokenizer.from_pretrained(model_name)
-
-model = AutoModelForCausalLM.from_pretrained(
-    model_name,
-    torch_dtype=torch.float16,
-).to("cpu")
-
-hf_pipeline = pipeline(
-    "text-generation",
-    model=model,
-    tokenizer=tokenizer,
-    device="cpu",
-    max_new_tokens=256,
-    do_sample=True,
-    temperature=0.7,
-    top_p=0.95,
-    repetition_penalty=1.15
-)
-
-llm = HuggingFacePipeline(pipeline=hf_pipeline)
-
-prompt = PromptTemplate(
-    input_variables=["object_name", "position_description"],
-    template="""
-당신은 예술작품을 설명하는 도슨트입니다.
-다음 정보를 바탕으로 관람객에게 친절하게 설명해 주세요:
-
-- 객체 이름: {object_name}
-- 위치 및 묘사: {position_description}
-
-도슨트 설명:
-"""
-)
-
-chain = LLMChain(llm=llm, prompt=prompt)
+def generate_description(prompt: str) -> str:
+    try:
+        response = gemini_model.generate_content(prompt)
+        return response.text.strip()
+    except Exception as e:
+        return f"Gemini API 오류: {e}"
 
 # ===========================
-# 이미지 임베딩 함수
+# 이미지 임베딩 함수 (GPU)
 # ===========================
 def image_embedding_from_pil(pil_img: Image.Image) -> np.ndarray:
-    inputs = clip_processor(images=pil_img, return_tensors="pt")
+    inputs = clip_processor(images=pil_img, return_tensors="pt").to("cuda")
     with torch.no_grad():
         emb = clip_model.get_image_features(**inputs)
     emb = emb / emb.norm(dim=-1, keepdim=True)
@@ -171,18 +149,36 @@ def detect_and_interact(image_path: str):
                     if indices[0][0] < len(crop_id_list):
                         matched_crop_id = crop_id_list[indices[0][0]]
                         description = crop_id_to_description.get(matched_crop_id, "설명 없음")
+
                         print(f"📄 파일명: {matched_crop_id}")
                         print(f"📝 설명: {description}")
 
                         try:
                             print("\n🤖 도슨트 설명:")
-                            llm_response = chain.run({
-                                "object_name": label,
-                                "position_description": description
-                            })
-                            print(llm_response + "\n")
+
+                            prompt = f"""
+                            당신은 예술작품을 설명하는 도슨트입니다.
+
+                            주어진 정보를 바탕으로 관람객에게 마치 전시장에서 직접 설명하듯, 따뜻하고 자연스럽게 말해 주세요.  
+                            말투는 구어체이며, 비유나 쉬운 단어를 사용해 주세요.
+
+                            [정보]
+                            - 객체 이름: {label}
+                            - 객체 설명: {description}
+
+                            도슨트 설명:
+                            """
+
+                            start_time = time.time()
+                            output_text = generate_description(prompt)
+                            end_time = time.time()
+
+                            print("\n" + output_text + "\n")
+                            print(f"⏱️ 응답 소요 시간: {end_time - start_time:.2f}초")
+
                         except Exception as e:
-                            print("❗ LLM 실행 중 오류 발생:", e)
+                            print("❗ Gemini 실행 중 오류 발생:", e)
+
                     else:
                         print("❗ 인덱스 범위를 벗어났습니다.")
                     return

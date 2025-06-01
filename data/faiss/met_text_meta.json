@@ -1,82 +1,66 @@
 [
   {
-    "id": "435627",
-    "objectID": 435627,
-    "title": "In the Sun",
-    "artist": "Charles-Edouard de Beaumont",
-    "summary": "In the Sun. Charles-Edouard de Beaumont. 1875. Oil on canvas.",
-    "image_path": "data/met_images/image_435627.jpg"
+    "id": "437722",
+    "objectID": 437722,
+    "title": "The Mass of Saint Gregory",
+    "artist": "Spanish Painter",
+    "summary": "The Mass of Saint Gregory. Spanish Painter. . Oil and gold on wood.",
+    "image_path": "data/met_images/image_437722.jpg"
   },
   {
-    "id": "435630",
-    "objectID": 435630,
-    "title": "Edward Miles (1752–1828)",
-    "artist": "Sir William Beechey",
-    "summary": "Edward Miles (1752–1828). Sir William Beechey. . Oil on canvas.",
-    "image_path": "data/met_images/image_435630.jpg"
+    "id": "437724",
+    "objectID": 437724,
+    "title": "Virgin and Child Enthroned with Saints Catherine and Jerome",
+    "artist": "Spanish Painter",
+    "summary": "Virgin and Child Enthroned with Saints Catherine and Jerome. Spanish Painter. . Tempera, oil, and gold on wood.",
+    "image_path": "data/met_images/image_437724.jpg"
   },
   {
-    "id": "435631",
-    "objectID": 435631,
-    "title": "George IV (1762–1830), When Prince of Wales",
-    "artist": "Sir William Beechey",
-    "summary": "George IV (1762–1830), When Prince of Wales. Sir William Beechey. . Oil on canvas.",
-    "image_path": "data/met_images/image_435631.jpg"
+    "id": "437725",
+    "objectID": 437725,
+    "title": "Doña Marianna Stampa Parravicina (born 1612), Condesa di Segrate",
+    "artist": "Spanish Painter",
+    "summary": "Doña Marianna Stampa Parravicina (born 1612), Condesa di Segrate. Spanish Painter. . Oil on canvas.",
+    "image_path": "data/met_images/image_437725.jpg"
   },
   {
-    "id": "435632",
-    "objectID": 435632,
-    "title": "Portrait of a Woman",
-    "artist": "Sir William Beechey",
-    "summary": "Portrait of a Woman. Sir William Beechey. ca. 1805. Oil on canvas.",
-    "image_path": "data/met_images/image_435632.jpg"
+    "id": "437728",
+    "objectID": 437728,
+    "title": "Portrait of a Man",
+    "artist": "Spanish (Andalusian) Painter",
+    "summary": "Portrait of a Man. Spanish (Andalusian) Painter. . Oil on canvas.",
+    "image_path": "data/met_images/image_437728.jpg"
   },
   {
-    "id": "435633",
-    "objectID": 435633,
-    "title": "Skating at Sloten, near Amsterdam",
-    "artist": "Johannes Abrahamsz Beerstraten",
-    "summary": "Skating at Sloten, near Amsterdam. Johannes Abrahamsz Beerstraten. . Oil on canvas.",
-    "image_path": "data/met_images/image_435633.jpg"
+    "id": "437729",
+    "objectID": 437729,
+    "title": "Saint Michael the Archangel",
+    "artist": "Ignacio de Ries",
+    "summary": "Saint Michael the Archangel. Ignacio de Ries. 1640s. Oil on canvas.",
+    "image_path": "data/met_images/image_437729.jpg"
   },
   {
-    "id": "435634",
-    "objectID": 435634,
-    "title": "Miss Chambers",
-    "artist": "Isabella Beetham",
-    "summary": "Miss Chambers. Isabella Beetham. after 1782. Ivory.",
-    "image_path": "data/met_images/image_435634.jpg"
+    "id": "437733",
+    "objectID": 437733,
+    "title": "Virgin and Child with the Pietà and Saints",
+    "artist": "Spanish (Castilian) Painter",
+    "summary": "Virgin and Child with the Pietà and Saints. Spanish (Castilian) Painter. . Tempera and gold on wood.",
+    "image_path": "data/met_images/image_437733.jpg"
   },
   {
-    "id": "435635",
-    "objectID": 435635,
-    "title": "Chancellor Leonhard von Eck (1480–1550)",
-    "artist": "Barthel Beham",
-    "summary": "Chancellor Leonhard von Eck (1480–1550). Barthel Beham. 1527. Oil on spruce.",
-    "image_path": "data/met_images/image_435635.jpg"
+    "id": "437734",
+    "objectID": 437734,
+    "title": "Head of a Man",
+    "artist": "Spanish (Castilian) Painter",
+    "summary": "Head of a Man. Spanish (Castilian) Painter. . Oil on canvas.",
+    "image_path": "data/met_images/image_437734.jpg"
   },
   {
-    "id": "435636",
-    "objectID": 435636,
-    "title": "Portrait of a Woman",
-    "artist": "Rudolphe Bel",
-    "summary": "Portrait of a Woman. Rudolphe Bel. 1822. Paper stretched over metal.",
-    "image_path": "data/met_images/image_435636.jpg"
-  },
-  {
-    "id": "435637",
-    "objectID": 435637,
-    "title": "Charles de Saint-Radegonde, called Charles Coguin, Abbot of Anchin",
-    "artist": "Jean Bellegambe",
-    "summary": "Charles de Saint-Radegonde, called Charles Coguin, Abbot of Anchin. Jean Bellegambe. ca. 1511–20. Oil on wood.",
-    "image_path": "data/met_images/image_435637.jpg"
-  },
-  {
-    "id": "435638",
-    "objectID": 435638,
-    "title": "The Cellier Altarpiece",
-    "artist": "Jean Bellegambe",
-    "summary": "The Cellier Altarpiece. Jean Bellegambe. 1511–12. Oil on wood.",
-    "image_path": "data/met_images/image_435638.jpg"
+    "id": "437736",
+    "objectID": 437736,
+    "title": "Christ among the Doctors",
+    "artist": "Spanish (Catalan) Painter",
+    "summary": "Christ among the Doctors. Spanish (Catalan) Painter. . Tempera and gold on wood.",
+    "image_path": "data/met_images/image_437736.jpg"
   }
 ]

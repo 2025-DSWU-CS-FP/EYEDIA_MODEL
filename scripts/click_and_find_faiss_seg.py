@@ -9,8 +9,8 @@ BACKEND_URL = "http://localhost:8080/api/model/response"  # Spring Boot 백엔�
 
 def generate_met_image_meta_from_structured():
     structured_path = Path("./data/faiss/met_structured_with_objects.json")
-    image_index_path = Path("./data/faiss/met_image.index")
-    output_path = Path("./data/faiss/met_image_meta.json")
+    image_index_path = Path("./scripts/data/faiss/met_image.index")
+    output_path = Path("./scripts/data/faiss/met_image_meta.json")
 
     if not structured_path.exists():
         raise FileNotFoundError(f"❗ met_structured_with_objects.json 파일이 없습니다: {structured_path}")
@@ -144,5 +144,5 @@ def run(image_path):
     cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    generate_met_image_meta_from_structured()
-    run("data/met_images/image_435638.jpg")
+    generate_met_image_meta_from_structured() 
+    run("data/met_images/image_436499.jpg")

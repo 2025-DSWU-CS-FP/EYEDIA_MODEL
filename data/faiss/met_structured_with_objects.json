@@ -1,168 +1,42 @@
 [
   {
-    "full_image_id": 435627,
-    "full_image_description": "In the Sun. Charles-Edouard de Beaumont. 1875. Oil on canvas.",
-    "crops": [
-      {
-        "crop_id": "image_435627_crop1.jpg",
-        "crop_description": "Oil on canvas Charles-Edouard de Beaumont"
-      },
-      {
-        "crop_id": "image_435627_crop2.jpg",
-        "crop_description": "Oil on canvas Charles-Edouard de Beaumont"
-      },
-      {
-        "crop_id": "image_435627_crop3.jpg",
-        "crop_description": "Oil on canvas Charles-Edouard de Beaumont"
-      },
-      {
-        "crop_id": "image_435627_crop4.jpg",
-        "crop_description": "Oil on canvas Charles-Edouard de Beaumont"
-      },
-      {
-        "crop_id": "image_435627_crop5.jpg",
-        "crop_description": "Oil on canvas Charles-Edouard de Beaumont"
-      }
-    ]
-  },
-  {
-    "full_image_id": 435630,
-    "full_image_description": "Edward Miles (1752–1828). Sir William Beechey. . Oil on canvas.",
-    "crops": [
-      {
-        "crop_id": "image_435630_crop1.jpg",
-        "crop_description": "Oil on canvas Sir William Beechey"
-      },
-      {
-        "crop_id": "image_435630_crop1.jpg",
-        "crop_description": "Sir William Beechey Oil on canvas"
-      }
-    ]
-  },
-  {
-    "full_image_id": 435631,
-    "full_image_description": "George IV (1762–1830), When Prince of Wales. Sir William Beechey. . Oil on canvas.",
-    "crops": [
-      {
-        "crop_id": "image_435631_crop1.jpg",
-        "crop_description": "Oil on canvas Sir William Beechey"
-      }
-    ]
-  },
-  {
-    "full_image_id": 435632,
-    "full_image_description": "Portrait of a Woman. Sir William Beechey. ca. 1805. Oil on canvas.",
-    "crops": [
-      {
-        "crop_id": "image_435632_crop1.jpg",
-        "crop_description": "Portrait of a Woman Oil on canvas"
-      },
-      {
-        "crop_id": "image_435632_crop2.jpg",
-        "crop_description": "Portrait of a Woman Oil on canvas"
-      }
-    ]
-  },
-  {
-    "full_image_id": 435633,
-    "full_image_description": "Skating at Sloten, near Amsterdam. Johannes Abrahamsz Beerstraten. . Oil on canvas.",
-    "crops": [
-      {
-        "crop_id": "image_435633_crop1.jpg",
-        "crop_description": "Skating at Sloten, near Amsterdam Oil on canvas"
-      },
-      {
-        "crop_id": "image_435633_crop2.jpg",
-        "crop_description": "Skating at Sloten, near Amsterdam Oil on canvas"
-      },
-      {
-        "crop_id": "image_435633_crop3.jpg",
-        "crop_description": "Skating at Sloten, near Amsterdam Oil on canvas"
-      },
-      {
-        "crop_id": "image_435633_crop4.jpg",
-        "crop_description": "Skating at Sloten, near Amsterdam Oil on canvas"
-      },
-      {
-        "crop_id": "image_435633_crop5.jpg",
-        "crop_description": "Skating at Sloten, near Amsterdam Oil on canvas"
-      },
-      {
-        "crop_id": "image_435633_crop6.jpg",
-        "crop_description": "Skating at Sloten, near Amsterdam Oil on canvas"
-      },
-      {
-        "crop_id": "image_435633_crop7.jpg",
-        "crop_description": "Skating at Sloten, near Amsterdam Oil on canvas"
-      },
-      {
-        "crop_id": "image_435633_crop8.jpg",
-        "crop_description": "Skating at Sloten, near Amsterdam Oil on canvas"
-      },
-      {
-        "crop_id": "image_435633_crop9.jpg",
-        "crop_description": "Skating at Sloten, near Amsterdam Oil on canvas"
-      },
-      {
-        "crop_id": "image_435633_crop10.jpg",
-        "crop_description": "Skating at Sloten, near Amsterdam Oil on canvas"
-      },
-      {
-        "crop_id": "image_435633_crop11.jpg",
-        "crop_description": "Skating at Sloten, near Amsterdam Oil on canvas"
-      },
-      {
-        "crop_id": "image_435633_crop12.jpg",
-        "crop_description": "Skating at Sloten, near Amsterdam Oil on canvas"
-      },
-      {
-        "crop_id": "image_435633_crop13.jpg",
-        "crop_description": "Skating at Sloten, near Amsterdam Oil on canvas"
-      }
-    ]
-  },
-  {
-    "full_image_id": 435634,
-    "full_image_description": "Miss Chambers. Isabella Beetham. after 1782. Ivory.",
-    "crops": [
-      {
-        "crop_id": "image_435634_crop1.jpg",
-        "crop_description": "Ivory Miss Chambers"
-      }
-    ]
-  },
-  {
-    "full_image_id": 435635,
-    "full_image_description": "Chancellor Leonhard von Eck (1480–1550). Barthel Beham. 1527. Oil on spruce.",
-    "crops": [
-      {
-        "crop_id": "image_435635_crop1.jpg",
-        "crop_description": "Oil on spruce Barthel Beham"
-      }
-    ]
-  },
-  {
-    "full_image_id": 435636,
-    "full_image_description": "Portrait of a Woman. Rudolphe Bel. 1822. Paper stretched over metal.",
+    "full_image_id": 437722,
+    "full_image_description": "The Mass of Saint Gregory. Spanish Painter. . Oil and gold on wood.",
     "crops": []
   },
   {
-    "full_image_id": 435637,
-    "full_image_description": "Charles de Saint-Radegonde, called Charles Coguin, Abbot of Anchin. Jean Bellegambe. ca. 1511–20. Oil on wood.",
+    "full_image_id": 437724,
+    "full_image_description": "Virgin and Child Enthroned with Saints Catherine and Jerome. Spanish Painter. . Tempera, oil, and gold on wood.",
     "crops": []
   },
   {
-    "full_image_id": 435638,
-    "full_image_description": "The Cellier Altarpiece. Jean Bellegambe. 1511–12. Oil on wood.",
-    "crops": [
-      {
-        "crop_id": "image_435638_crop1.jpg",
-        "crop_description": "Jean Bellegambe The Cellier Altarpiece"
-      },
-      {
-        "crop_id": "image_435638_crop2.jpg",
-        "crop_description": "Jean Bellegambe The Cellier Altarpiece"
-      }
-    ]
+    "full_image_id": 437725,
+    "full_image_description": "Doña Marianna Stampa Parravicina (born 1612), Condesa di Segrate. Spanish Painter. . Oil on canvas.",
+    "crops": []
+  },
+  {
+    "full_image_id": 437728,
+    "full_image_description": "Portrait of a Man. Spanish (Andalusian) Painter. . Oil on canvas.",
+    "crops": []
+  },
+  {
+    "full_image_id": 437729,
+    "full_image_description": "Saint Michael the Archangel. Ignacio de Ries. 1640s. Oil on canvas.",
+    "crops": []
+  },
+  {
+    "full_image_id": 437733,
+    "full_image_description": "Virgin and Child with the Pietà and Saints. Spanish (Castilian) Painter. . Tempera and gold on wood.",
+    "crops": []
+  },
+  {
+    "full_image_id": 437734,
+    "full_image_description": "Head of a Man. Spanish (Castilian) Painter. . Oil on canvas.",
+    "crops": []
+  },
+  {
+    "full_image_id": 437736,
+    "full_image_description": "Christ among the Doctors. Spanish (Catalan) Painter. . Tempera and gold on wood.",
+    "crops": []
   }
 ]
