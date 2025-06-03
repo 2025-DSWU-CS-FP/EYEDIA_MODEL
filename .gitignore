@@ -6,3 +6,10 @@
 *.png
 data/cropped_images/
 *.pt
+/cropped_images/
+__pycache__/
+*.py[cod]
+.vscode/
+.idea/
+.env
+scripts/data/

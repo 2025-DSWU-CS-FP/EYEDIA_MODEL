@@ -1,0 +1,14 @@
+torch
+torchvision
+torchaudio
+transformers
+faiss-cpu
+pillow
+opencv-python
+numpy
+ultralytics
+
+# LangChain + Ollama
+langchain
+langchain-community
+requests
