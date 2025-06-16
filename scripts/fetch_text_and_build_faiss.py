@@ -1,6 +1,9 @@
 import requests, json, faiss, os
 from sentence_transformers import SentenceTransformer
 
+def safe_text(s):
+    return s.encode("ascii", "ignore").decode("ascii")  # ASCII 이외 문자 제거
+
 def fetch_met_data():
     os.makedirs("./data/met_images", exist_ok=True)
     os.makedirs("./data/faiss", exist_ok=True)
@@ -52,7 +55,8 @@ def fetch_met_data():
             "crops": []  # 후처리에서 crop_id, crop_description 추가 예정
         })
 
-        print(f"✅ [{i+1}] {title} (objectID: {object_id})")
+        # ✅ CP949 오류 방지를 위해 ASCII-safe title 출력
+        print(f"[{i+1}] {safe_text(title)} (objectID: {object_id})")
 
     # FAISS 인덱스 저장
     embeddings = embedder.encode(texts, convert_to_numpy=True, normalize_embeddings=True).astype("float32")

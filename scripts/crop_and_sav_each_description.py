@@ -24,7 +24,7 @@ def crop_and_update_structured():
 
     # 📄 메타데이터 없으면 빈 구조 생성
     if not structured_path.exists():
-        print(f"📄 {structured_path} 파일이 없어 기본 템플릿 생성")
+        print(f" {structured_path} 파일이 없어 기본 템플릿 생성")
         with open(structured_path, "w", encoding="utf-8") as f:
             json.dump([], f, indent=2, ensure_ascii=False)
 
@@ -34,7 +34,7 @@ def crop_and_update_structured():
         yolo = YOLO("yolov8n-seg.pt")
         sbert = SentenceTransformer("snunlp/KR-SBERT-V40K-klueNLI-augSTS")
     except Exception as e:
-        print(f"❌ 모델 로딩 실패: {e}")
+        print(f" 모델 로딩 실패: {e}")
         return
 
     # 📖 메타 데이터 로딩
@@ -42,7 +42,7 @@ def crop_and_update_structured():
         structured_data = json.load(f)
 
     if not structured_data:
-        print("⚠️ 메타데이터가 비어 있습니다. crop 생성 없이 종료됩니다.")
+        print("메타데이터가 비어 있습니다. crop 생성 없이 종료됩니다.")
         return
 
     # 🔍 이미지별 처리
@@ -52,17 +52,17 @@ def crop_and_update_structured():
         img = cv2.imread(str(img_path))
 
         if img is None:
-            print(f"⚠️ 이미지 로드 실패: {img_path}")
+            print(f"이미지 로드 실패: {img_path}")
             continue
 
         full_desc_text = item.get("full_image_description", "")
         if not full_desc_text:
-            print(f"❗ 설명 없음: {full_image_id}")
+            print(f" 설명 없음: {full_image_id}")
             continue
 
         description_sentences = [s.strip() for s in full_desc_text.replace("**", "").split(".") if s.strip()]
         if not description_sentences:
-            print(f"❗ 설명 문장이 없음: {full_image_id}")
+            print(f" 설명 문장이 없음: {full_image_id}")
             continue
 
         sentence_embeddings = sbert.encode(description_sentences, convert_to_tensor=True)
@@ -71,7 +71,7 @@ def crop_and_update_structured():
         results = yolo(img_resized, conf=0.3)[0]
 
         if not results.masks:
-            print(f"⚠️ 객체 감지 실패: {full_image_id}")
+            print(f" 객체 감지 실패: {full_image_id}")
             continue
 
         item["crops"] = []
@@ -111,8 +111,8 @@ def crop_and_update_structured():
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(structured_data, f, indent=2, ensure_ascii=False)
 
-    print(f"✅ 객체 정보가 {output_path.name} 에 저장되었습니다.")
-    print(f"✅ 총 {sum(len(i['crops']) for i in structured_data)}개의 crop 객체가 생성되었습니다.")
+    print(f" 객체 정보가 {output_path.name} 에 저장되었습니다.")
+    print(f" 총 {sum(len(i['crops']) for i in structured_data)}개의 crop 객체가 생성되었습니다.")
 
 if __name__ == "__main__":
     crop_and_update_structured()
