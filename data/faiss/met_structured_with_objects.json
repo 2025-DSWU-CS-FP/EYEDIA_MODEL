@@ -1,5 +1,6 @@
 [
   {
+<<<<<<< HEAD
     "full_image_id": 436418,
     "full_image_description": "Jerusalem from the Mount of Olives. Charles-Théodore Frère. by 1880. Oil on canvas.",
     "crops": [
@@ -104,5 +105,45 @@
     "full_image_id": 436427,
     "full_image_description": "A Partridge and Small Game Birds. Jan Fyt. 1650s. Oil on canvas.",
     "crops": []
+=======
+    "full_image_id": 437722,
+    "full_image_description": "The Mass of Saint Gregory. Spanish Painter. . Oil and gold on wood.",
+    "crops": []
+  },
+  {
+    "full_image_id": 437724,
+    "full_image_description": "Virgin and Child Enthroned with Saints Catherine and Jerome. Spanish Painter. . Tempera, oil, and gold on wood.",
+    "crops": []
+  },
+  {
+    "full_image_id": 437725,
+    "full_image_description": "Doña Marianna Stampa Parravicina (born 1612), Condesa di Segrate. Spanish Painter. . Oil on canvas.",
+    "crops": []
+  },
+  {
+    "full_image_id": 437728,
+    "full_image_description": "Portrait of a Man. Spanish (Andalusian) Painter. . Oil on canvas.",
+    "crops": []
+  },
+  {
+    "full_image_id": 437729,
+    "full_image_description": "Saint Michael the Archangel. Ignacio de Ries. 1640s. Oil on canvas.",
+    "crops": []
+  },
+  {
+    "full_image_id": 437733,
+    "full_image_description": "Virgin and Child with the Pietà and Saints. Spanish (Castilian) Painter. . Tempera and gold on wood.",
+    "crops": []
+  },
+  {
+    "full_image_id": 437734,
+    "full_image_description": "Head of a Man. Spanish (Castilian) Painter. . Oil on canvas.",
+    "crops": []
+  },
+  {
+    "full_image_id": 437736,
+    "full_image_description": "Christ among the Doctors. Spanish (Catalan) Painter. . Tempera and gold on wood.",
+    "crops": []
+>>>>>>> develop
   }
 ]

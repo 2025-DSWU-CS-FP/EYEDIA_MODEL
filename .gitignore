@@ -2,6 +2,7 @@
 *.png
 data/cropped_images/
 *.pt
+<<<<<<< HEAD
 .jpg# 🔹 Python 관련
 __pycache__/
 *.pyc
@@ -29,3 +30,12 @@ models/
 # 🔹 기타
 .env
 .DS_Store
+=======
+/cropped_images/
+__pycache__/
+*.py[cod]
+.vscode/
+.idea/
+.env
+scripts/data/
+>>>>>>> develop
