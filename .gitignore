@@ -1,11 +1,36 @@
-./data/faiss
-./data/cropped_images/*
-./scripts/api
 ./logs/
-*.jpg
 *.png
 data/cropped_images/
 *.pt
+<<<<<<< HEAD
+.jpg# 🔹 Python 관련
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.ipynb_checkpoints/
+
+# 🔹 모델 체크포인트
+*.pt
+models/
+!models/README.md  # 만약 모델 설명을 위한 문서가 있다면 예외 처리
+
+# 🔹 데이터
+#data/cropped_images/
+#data/met_images/
+#data/faiss/
+#*.index
+#*.json  # 만약 image_data.json이나 FAISS 관련 메타가 자주 변한다면
+
+# 🔹 IDE 설정
+.vscode/
+*.swp
+*.swo
+
+# 🔹 기타
+.env
+.DS_Store
+=======
 /cropped_images/
 __pycache__/
 *.py[cod]
@@ -13,3 +38,4 @@ __pycache__/
 .idea/
 .env
 scripts/data/
+>>>>>>> develop

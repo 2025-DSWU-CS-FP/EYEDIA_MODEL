@@ -1,71 +1,81 @@
 import requests, json, faiss, os
-from sentence_transformers import SentenceTransformer
+from PIL import Image
+from transformers import CLIPProcessor, CLIPModel
+import torch
 
-def fetch_met_data():
-    os.makedirs("./data/met_images", exist_ok=True)
+def safe_text(s):
+    return s.encode("ascii", "ignore").decode("ascii")  # ASCII 이외 문자 제거
+
+
+# def enrich_description(description):
+#     prompt = f"이 문장을 바탕으로 예술 작품 객체에 대한 자세한 한국어 설명을 생성해줘:\n'{description}'"
+#     try:
+#         response = requests.post(LLM_API_URL, json={"prompt": prompt, "max_tokens": 100})
+#         response.raise_for_status()
+#         return response.json().get("output", description)  # 실패 시 원본 유지
+#     except Exception as e:
+#         print(f"❗ LLM 요청 실패: {e}")
+#         return description
+
+
+
+def fetch_crop_based_faiss():
     os.makedirs("./data/faiss", exist_ok=True)
 
-    department_id = 11  # European Paintings
-    res = requests.get(f"https://collectionapi.metmuseum.org/public/collection/v1/objects?departmentIds={department_id}")
-    object_ids = res.json().get("objectIDs", [])[:10]
+    # 🔄 CLIP 모델 로딩
+    clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
+    processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    clip_model.to(device)
 
-    embedder = SentenceTransformer("snunlp/KR-SBERT-V40K-klueNLI-augSTS")
-    texts, faiss_meta, structured_data = [], [], []
+    # 📄 crop이 들어 있는 구조화 데이터 로딩
+    structured_path = "./data/faiss/met_structured_with_objects.json"
+    if not os.path.exists(structured_path):
+        print("❗ 구조화 JSON이 존재하지 않습니다.")
+        return
 
-    for i, object_id in enumerate(object_ids):
-        obj = requests.get(f"https://collectionapi.metmuseum.org/public/collection/v1/objects/{object_id}").json()
-        if not obj.get("primaryImageSmall"):
-            continue  # 이미지 없는 경우 스킵
+    with open(structured_path, "r", encoding="utf-8") as f:
+        structured_data = json.load(f)
 
-        title = obj.get("title", "")
-        artist = obj.get("artistDisplayName", "")
-        date = obj.get("objectDate", "")
-        medium = obj.get("medium", "")
-        culture = obj.get("culture", "")
-        img_url = obj["primaryImageSmall"]
-        image_path = f"data/met_images/image_{object_id}.jpg"
+    crop_texts = []
+    crop_meta = []
 
-        try:
-            with open(image_path, "wb") as f:
-                f.write(requests.get(img_url).content)
-        except:
-            continue
+    for item in structured_data:
+        full_image_id = item["full_image_id"]
+        for crop in item.get("crops", []):
+            crop_id = crop["crop_id"]
+            crop_description = crop["crop_description"]
+            crop_texts.append(crop_description)
+            crop_meta.append({
+                "crop_id": crop_id,
+                "full_image_id": full_image_id,
+                "crop_description": crop_description
+            })
 
-        # 전체 설명 (FAISS 임베딩용)
-        summary = f"{title}. {artist}. {date}. {medium}. {culture}".strip()[:300]
-        texts.append(summary)
+    if not crop_texts:
+        print("❗ crop_description 데이터가 없습니다.")
+        return
 
-        # FAISS 메타 저장용
-        faiss_meta.append({
-            "id": f"{object_id}",
-            "objectID": object_id,
-            "title": title,
-            "artist": artist,
-            "summary": summary,
-            "image_path": image_path
-        })
+    # 🧠 텍스트 임베딩 수행
+    with torch.no_grad():
+        inputs = processor(text=crop_texts, return_tensors="pt", padding=True, truncation=True).to(device)
+        embeddings = clip_model.get_text_features(**inputs)
+        embeddings = embeddings / embeddings.norm(dim=-1, keepdim=True)
+        embeddings_np = embeddings.cpu().numpy().astype("float32")
 
-        # 구조화된 JSON
-        structured_data.append({
-            "full_image_id": object_id,
-            "full_image_description": summary,
-            "crops": []  # 후처리에서 crop_id, crop_description 추가 예정
-        })
+    print(f"✅ crop 기반 임베딩 차원: {embeddings_np.shape[1]}")
+    print(f"📦 총 crop 개수: {len(crop_meta)}")
 
-        print(f"✅ [{i+1}] {title} (objectID: {object_id})")
+    # ✅ FAISS 인덱스 생성 및 저장
+    index = faiss.IndexFlatIP(embeddings_np.shape[1])
+    index.add(embeddings_np)
+    faiss.write_index(index, "./data/faiss/met_crop.index")
 
-    # FAISS 인덱스 저장
-    embeddings = embedder.encode(texts, convert_to_numpy=True, normalize_embeddings=True).astype("float32")
-    index = faiss.IndexFlatIP(embeddings.shape[1])
-    index.add(embeddings)
-    faiss.write_index(index, "./data/faiss/met_text.index")
+    # 메타 정보 저장
+    with open("./data/faiss/met_crop_meta.json", "w", encoding="utf-8") as f:
+        json.dump(crop_meta, f, indent=2, ensure_ascii=False)
 
-    # 메타 정보 저장 
-    with open("./data/faiss/met_text_meta.json", "w", encoding="utf-8") as f:
-        json.dump(faiss_meta, f, indent=2, ensure_ascii=False)
-
-    with open("./data/faiss/met_structured_with_objects.json", "w", encoding="utf-8") as f:
-        json.dump(structured_data, f, indent=2, ensure_ascii=False)
+    print("🎉 crop 기반 FAISS 인덱스 및 메타 저장 완료")
 
 if __name__ == "__main__":
-    fetch_met_data()
+    fetch_crop_based_faiss()

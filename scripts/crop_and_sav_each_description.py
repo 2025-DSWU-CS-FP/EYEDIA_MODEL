@@ -5,73 +5,96 @@ import numpy as np
 from PIL import Image
 from pathlib import Path
 import torch
-from transformers import CLIPProcessor, CLIPModel
 from ultralytics import YOLO
 from sentence_transformers import SentenceTransformer, util
+import google.generativeai as genai
+from dotenv import load_dotenv
+
+# 📌 환경변수에서 Gemini API 키 불러오기
+load_dotenv()
+api_key = os.getenv("GEMINI_API_KEY")
+if not api_key:
+    raise ValueError("❗ 환경 변수 'GEMINI_API_KEY'가 설정되지 않았습니다.")
+genai.configure(api_key=api_key)
+gemini_model = genai.GenerativeModel("models/gemini-2.0-flash")
+
+def generate_docent_description_gemini(label: str, description: str) -> str:
+    prompt = f"""
+당신은 예술작품을 설명하는 한국어 도슨트입니다.
+
+주어진 정보를 바탕으로 '{label}'에 대한 감성적이고 직관적인 설명을 관람객에게 전달해 주세요.
+말투는 구어체이며, 쉬운 단어와 비유를 사용하고 최대한 자세하게 설명해주세요. 
+이것을 person이라고 부르기로 했어요 등의 label에 대한 직접적인 언급은 하지 마세요. 
+
+[정보]
+- 객체 이름: {label}
+- 객체 설명: {description}
+
+도슨트 설명:
+"""
+    try:
+        response = gemini_model.generate_content(prompt)
+        return response.text.strip()
+    except Exception as e:
+        print(f"❗ Gemini 설명 생성 실패: {e}")
+        return description
 
 def crop_and_update_structured():
-    # 📂 경로 설정
     image_dir = Path("data/met_images")
     crop_dir = Path("data/cropped_images")
     faiss_dir = Path("data/faiss")
     structured_path = faiss_dir / "met_structured_with_objects.json"
     output_path = faiss_dir / "met_structured_with_objects.json"
 
-    # 📁 폴더 없으면 생성
     image_dir.mkdir(parents=True, exist_ok=True)
     crop_dir.mkdir(parents=True, exist_ok=True)
     faiss_dir.mkdir(parents=True, exist_ok=True)
 
-    # 📄 메타데이터 없으면 빈 구조 생성
     if not structured_path.exists():
-        print(f"📄 {structured_path} 파일이 없어 기본 템플릿 생성")
+        print(f"{structured_path} 파일이 없어 기본 템플릿 생성")
         with open(structured_path, "w", encoding="utf-8") as f:
             json.dump([], f, indent=2, ensure_ascii=False)
 
-    # 🧠 모델 로딩
     print("🔄 모델 불러오는 중...")
     try:
         yolo = YOLO("yolov8n-seg.pt")
         sbert = SentenceTransformer("snunlp/KR-SBERT-V40K-klueNLI-augSTS")
     except Exception as e:
-        print(f"❌ 모델 로딩 실패: {e}")
+        print(f"모델 로딩 실패: {e}")
         return
 
-    # 📖 메타 데이터 로딩
     with open(structured_path, "r", encoding="utf-8") as f:
         structured_data = json.load(f)
 
     if not structured_data:
-        print("⚠️ 메타데이터가 비어 있습니다. crop 생성 없이 종료됩니다.")
+        print("메타데이터가 비어 있습니다. crop 생성 없이 종료됩니다.")
         return
 
-    # 🔍 이미지별 처리
     for item in structured_data:
         full_image_id = item["full_image_id"]
         img_path = image_dir / f"image_{full_image_id}.jpg"
         img = cv2.imread(str(img_path))
 
         if img is None:
-            print(f"⚠️ 이미지 로드 실패: {img_path}")
+            print(f"이미지 로드 실패: {img_path}")
             continue
 
         full_desc_text = item.get("full_image_description", "")
         if not full_desc_text:
-            print(f"❗ 설명 없음: {full_image_id}")
+            print(f"설명 없음: {full_image_id}")
             continue
 
         description_sentences = [s.strip() for s in full_desc_text.replace("**", "").split(".") if s.strip()]
         if not description_sentences:
-            print(f"❗ 설명 문장이 없음: {full_image_id}")
+            print(f"설명 문장이 없음: {full_image_id}")
             continue
 
         sentence_embeddings = sbert.encode(description_sentences, convert_to_tensor=True)
-
         img_resized = cv2.resize(img, (1280, 720))
         results = yolo(img_resized, conf=0.3)[0]
 
         if not results.masks:
-            print(f"⚠️ 객체 감지 실패: {full_image_id}")
+            print(f"객체 감지 실패: {full_image_id}")
             continue
 
         item["crops"] = []
@@ -85,7 +108,9 @@ def crop_and_update_structured():
             query_embedding = sbert.encode(label, convert_to_tensor=True)
             cos_scores = util.cos_sim(query_embedding, sentence_embeddings)[0]
             top_indices = torch.topk(cos_scores, k=min(2, len(cos_scores))).indices.tolist()
-            description_map[label] = " ".join([description_sentences[i] for i in top_indices])
+            raw_description = " ".join([description_sentences[i] for i in top_indices])
+            enriched_description = generate_docent_description_gemini(label, raw_description)
+            description_map[label] = enriched_description
 
         label_count = {}
         for i, (mask, cls_idx) in enumerate(zip(masks, classes)):
@@ -101,18 +126,16 @@ def crop_and_update_structured():
             crop_path = crop_dir / crop_name
             cv2.imwrite(str(crop_path), cropped)
 
-            description = description_map.get(label, "")
             item["crops"].append({
                 "crop_id": crop_name,
-                "crop_description": description
+                "crop_description": description_map.get(label, "")
             })
 
-    # 💾 결과 저장
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(structured_data, f, indent=2, ensure_ascii=False)
 
     print(f"✅ 객체 정보가 {output_path.name} 에 저장되었습니다.")
-    print(f"✅ 총 {sum(len(i['crops']) for i in structured_data)}개의 crop 객체가 생성되었습니다.")
+    print(f"🔢 총 {sum(len(i['crops']) for i in structured_data)}개의 crop 객체가 생성되었습니다.")
 
 if __name__ == "__main__":
     crop_and_update_structured()
