@@ -6,12 +6,6 @@
       {
         "crop_id": "436236_0",
         "label": "person",
-        "bbox": [
-          114,
-          226,
-          361,
-          632
-        ],
         "crop_description": "설명 생성 실패"
       }
     ]
@@ -23,12 +17,6 @@
       {
         "crop_id": "436238_0",
         "label": "person",
-        "bbox": [
-          26,
-          85,
-          471,
-          639
-        ],
         "crop_description": "설명 생성 실패"
       }
     ]
@@ -40,12 +28,6 @@
       {
         "crop_id": "436239_0",
         "label": "person",
-        "bbox": [
-          82,
-          58,
-          483,
-          601
-        ],
         "crop_description": "설명 생성 실패"
       }
     ]
@@ -57,12 +39,6 @@
       {
         "crop_id": "436240_0",
         "label": "person",
-        "bbox": [
-          18,
-          18,
-          473,
-          633
-        ],
         "crop_description": "설명 생성 실패"
       }
     ]
@@ -74,56 +50,26 @@
       {
         "crop_id": "436241_0",
         "label": "person",
-        "bbox": [
-          174,
-          282,
-          193,
-          337
-        ],
         "crop_description": "설명 생성 실패"
       },
       {
         "crop_id": "436241_1",
         "label": "horse",
-        "bbox": [
-          58,
-          270,
-          109,
-          321
-        ],
         "crop_description": "설명 생성 실패"
       },
       {
         "crop_id": "436241_2",
         "label": "cow",
-        "bbox": [
-          270,
-          306,
-          309,
-          349
-        ],
         "crop_description": "설명 생성 실패"
       },
       {
         "crop_id": "436241_3",
         "label": "horse",
-        "bbox": [
-          270,
-          306,
-          309,
-          353
-        ],
         "crop_description": "설명 생성 실패"
       },
       {
         "crop_id": "436241_4",
         "label": "dog",
-        "bbox": [
-          94,
-          326,
-          136,
-          348
-        ],
         "crop_description": "설명 생성 실패"
       }
     ]
@@ -135,12 +81,6 @@
       {
         "crop_id": "436242_0",
         "label": "person",
-        "bbox": [
-          174,
-          194,
-          457,
-          508
-        ],
         "crop_description": "설명 생성 실패"
       }
     ]
@@ -152,12 +92,6 @@
       {
         "crop_id": "436243_0",
         "label": "person",
-        "bbox": [
-          42,
-          38,
-          501,
-          629
-        ],
         "crop_description": "설명 생성 실패"
       }
     ]
@@ -169,45 +103,21 @@
       {
         "crop_id": "436244_0",
         "label": "person",
-        "bbox": [
-          274,
-          170,
-          528,
-          627
-        ],
         "crop_description": "설명 생성 실패"
       },
       {
         "crop_id": "436244_1",
         "label": "person",
-        "bbox": [
-          14,
-          34,
-          363,
-          581
-        ],
         "crop_description": "설명 생성 실패"
       },
       {
         "crop_id": "436244_2",
         "label": "person",
-        "bbox": [
-          18,
-          430,
-          313,
-          628
-        ],
         "crop_description": "설명 생성 실패"
       },
       {
         "crop_id": "436244_3",
         "label": "person",
-        "bbox": [
-          14,
-          430,
-          469,
-          639
-        ],
         "crop_description": "설명 생성 실패"
       }
     ]
@@ -219,23 +129,11 @@
       {
         "crop_id": "436245_0",
         "label": "person",
-        "bbox": [
-          46,
-          30,
-          469,
-          633
-        ],
         "crop_description": "설명 생성 실패"
       },
       {
         "crop_id": "436245_1",
         "label": "teddy bear",
-        "bbox": [
-          114,
-          322,
-          377,
-          601
-        ],
         "crop_description": "설명 생성 실패"
       }
     ]
@@ -247,12 +145,6 @@
       {
         "crop_id": "436246_0",
         "label": "person",
-        "bbox": [
-          22,
-          62,
-          417,
-          625
-        ],
         "crop_description": "설명 생성 실패"
       }
     ]
