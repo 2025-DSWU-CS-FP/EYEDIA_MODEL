@@ -3,116 +3,89 @@ import json
 import cv2
 import numpy as np
 from PIL import Image
-from pathlib import Path
-import torch
-from transformers import CLIPProcessor, CLIPModel
 from ultralytics import YOLO
-from sentence_transformers import SentenceTransformer, util
+from dotenv import load_dotenv
+from openai import OpenAI
 
-def crop_and_update_structured():
-    # 📂 경로 설정
-    image_dir = Path("data/met_images")
-    crop_dir = Path("data/cropped_images")
-    faiss_dir = Path("data/faiss")
-    structured_path = faiss_dir / "met_structured_with_objects.json"
-    output_path = faiss_dir / "met_structured_with_objects.json"
+# ========== 환경 설정 ==========
+load_dotenv()
+api_key = os.getenv("OPENAI_API_KEY")
+if not api_key:
+    raise ValueError("❗ OPENAI_API_KEY가 설정되지 않았습니다.")
+client = OpenAI(api_key=api_key)
 
-    # 📁 폴더 없으면 생성
-    image_dir.mkdir(parents=True, exist_ok=True)
-    crop_dir.mkdir(parents=True, exist_ok=True)
-    faiss_dir.mkdir(parents=True, exist_ok=True)
+yolo = YOLO("yolov8n-seg.pt")
+IMAGE_DIR = "data/met_images"
+JSON_PATH = "data/faiss/met_structured_with_objects.json"
 
-    # 📄 메타데이터 없으면 빈 구조 생성
-    if not structured_path.exists():
-        print(f"📄 {structured_path} 파일이 없어 기본 템플릿 생성")
-        with open(structured_path, "w", encoding="utf-8") as f:
-            json.dump([], f, indent=2, ensure_ascii=False)
+# ========== GPT 설명 생성 함수 ==========
+def generate_docent_description(label: str, image_description: str) -> str:
+    prompt = f"""
+당신은 예술작품을 설명하는 한국어 도슨트입니다.
 
-    # 🧠 모델 로딩
-    print("🔄 모델 불러오는 중...")
+아래 이미지는 '{label}' 라는 객체를 포함하고 있으며, 전체 그림 설명은 다음과 같습니다:
+"{image_description}"
+
+이 객체에 대해 직관적이고 감성적인 도슨트 설명을 작성해 주세요.
+말투는 구어체로, 쉬운 단어와 비유를 사용하고 너무 짧지 않게 설명해 주세요.
+'객체'나 '레이블' 같은 표현은 쓰지 마세요. 무조건 한국어로 하세요.
+
+도슨트 설명:
+"""
     try:
-        yolo = YOLO("yolov8n-seg.pt")
-        sbert = SentenceTransformer("snunlp/KR-SBERT-V40K-klueNLI-augSTS")
+        response = client.chat.completions.create(
+            model="gpt-4",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.8
+        )
+        return response.choices[0].message.content.strip()
     except Exception as e:
-        print(f"❌ 모델 로딩 실패: {e}")
-        return
+        print(f"❗ GPT 오류: {e}")
+        return "설명 생성 실패"
 
-    # 📖 메타 데이터 로딩
-    with open(structured_path, "r", encoding="utf-8") as f:
-        structured_data = json.load(f)
+# ========== 이미지별 crop 처리 ==========
+def process_all_images():
+    with open(JSON_PATH, "r", encoding="utf-8") as f:
+        data = json.load(f)
 
-    if not structured_data:
-        print("⚠️ 메타데이터가 비어 있습니다. crop 생성 없이 종료됩니다.")
-        return
+    for item in data:
+        image_id = str(item["full_image_id"])
+        image_path = os.path.join(IMAGE_DIR, f"image_{image_id}.jpg")
+        full_desc = item.get("full_image_description", "")
 
-    # 🔍 이미지별 처리
-    for item in structured_data:
-        full_image_id = item["full_image_id"]
-        img_path = image_dir / f"image_{full_image_id}.jpg"
-        img = cv2.imread(str(img_path))
-
-        if img is None:
-            print(f"⚠️ 이미지 로드 실패: {img_path}")
+        if not os.path.exists(image_path):
+            print(f"❌ 이미지 없음: {image_path}")
             continue
 
-        full_desc_text = item.get("full_image_description", "")
-        if not full_desc_text:
-            print(f"❗ 설명 없음: {full_image_id}")
+        image = cv2.imread(image_path)
+        if image is None:
+            print(f"❌ 이미지 로드 실패: {image_path}")
             continue
 
-        description_sentences = [s.strip() for s in full_desc_text.replace("**", "").split(".") if s.strip()]
-        if not description_sentences:
-            print(f"❗ 설명 문장이 없음: {full_image_id}")
-            continue
-
-        sentence_embeddings = sbert.encode(description_sentences, convert_to_tensor=True)
-
-        img_resized = cv2.resize(img, (1280, 720))
-        results = yolo(img_resized, conf=0.3)[0]
-
+        results = yolo(image, conf=0.3)[0]
         if not results.masks:
-            print(f"⚠️ 객체 감지 실패: {full_image_id}")
+            print(f"⚠️ 객체 없음: {image_id}")
             continue
 
-        item["crops"] = []
-        class_names = results.names
         masks = results.masks.data.cpu().numpy()
         classes = results.boxes.cls.cpu().numpy().astype(int)
+        names = yolo.names
 
-        labels = list(set([class_names[idx] for idx in classes]))
-        description_map = {}
-        for label in labels:
-            query_embedding = sbert.encode(label, convert_to_tensor=True)
-            cos_scores = util.cos_sim(query_embedding, sentence_embeddings)[0]
-            top_indices = torch.topk(cos_scores, k=min(2, len(cos_scores))).indices.tolist()
-            description_map[label] = " ".join([description_sentences[i] for i in top_indices])
+        item["crops"] = []
+        for idx, mask in enumerate(masks):
+            label = names[classes[idx]]
 
-        label_count = {}
-        for i, (mask, cls_idx) in enumerate(zip(masks, classes)):
-            bin_mask = (mask > 0.5).astype(np.uint8)
-            ys, xs = np.where(bin_mask == 1)
-            if ys.size == 0 or xs.size == 0:
-                continue
+            # GPT 설명 생성
+            print(f"🖼️ crop_id: {image_id}_{idx} → GPT 설명 생성 중...")
+            gpt_desc = generate_docent_description(label, full_desc)
 
-            cropped = img_resized[np.min(ys):np.max(ys), np.min(xs):np.max(xs)]
-            label = class_names[cls_idx]
-            label_count[label] = label_count.get(label, 0) + 1
-            crop_name = f"image_{full_image_id}_crop{label_count[label]}.jpg"
-            crop_path = crop_dir / crop_name
-            cv2.imwrite(str(crop_path), cropped)
-
-            description = description_map.get(label, "")
             item["crops"].append({
-                "crop_id": crop_name,
-                "crop_description": description
+                "crop_id": f"{image_id}_{idx}",
+                "label": label,
+                "crop_description": gpt_desc
             })
+            print(f"✅ 생성 완료: {gpt_desc[:40]}...")
 
-    # 💾 결과 저장
-    with open(output_path, "w", encoding="utf-8") as f:
-        json.dump(structured_data, f, indent=2, ensure_ascii=False)
-
-    print(f"✅ 객체 정보가 {output_path.name} 에 저장되었습니다.")
-    print(f"✅ 총 {sum(len(i['crops']) for i in structured_data)}개의 crop 객체가 생성되었습니다.")
-
-if __name__ == "__main__":
-    crop_and_update_structured()
+    with open(JSON_PATH, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+    print(f"\n📁 전체 crop 설명 저장 완료: {JSON_PATH}")

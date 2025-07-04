@@ -1,66 +1,82 @@
 [
   {
-    "id": "437722",
-    "objectID": 437722,
-    "title": "The Mass of Saint Gregory",
-    "artist": "Spanish Painter",
-    "summary": "The Mass of Saint Gregory. Spanish Painter. . Oil and gold on wood.",
-    "image_path": "data/met_images/image_437722.jpg"
+    "id": "436236",
+    "objectID": 436236,
+    "title": "Benjamin Franklin (1706–1790)",
+    "artist": "Joseph Siffred Duplessis",
+    "summary": "Benjamin Franklin (1706–1790). Joseph Siffred Duplessis. 1778. Oil on canvas.",
+    "image_path": "data/met_images/image_436236.jpg"
   },
   {
-    "id": "437724",
-    "objectID": 437724,
-    "title": "Virgin and Child Enthroned with Saints Catherine and Jerome",
-    "artist": "Spanish Painter",
-    "summary": "Virgin and Child Enthroned with Saints Catherine and Jerome. Spanish Painter. . Tempera, oil, and gold on wood.",
-    "image_path": "data/met_images/image_437724.jpg"
+    "id": "436238",
+    "objectID": 436238,
+    "title": "Benjamin Franklin (1706–1790)",
+    "artist": "Joseph Siffred Duplessis",
+    "summary": "Benjamin Franklin (1706–1790). Joseph Siffred Duplessis. . Oil on canvas.",
+    "image_path": "data/met_images/image_436238.jpg"
   },
   {
-    "id": "437725",
-    "objectID": 437725,
-    "title": "Doña Marianna Stampa Parravicina (born 1612), Condesa di Segrate",
-    "artist": "Spanish Painter",
-    "summary": "Doña Marianna Stampa Parravicina (born 1612), Condesa di Segrate. Spanish Painter. . Oil on canvas.",
-    "image_path": "data/met_images/image_437725.jpg"
+    "id": "436239",
+    "objectID": 436239,
+    "title": "Anne Elizabeth Cholmley (1769–1788), Later Lady Mulgrave",
+    "artist": "Gainsborough Dupont",
+    "summary": "Anne Elizabeth Cholmley (1769–1788), Later Lady Mulgrave. Gainsborough Dupont. . Oil on wood.",
+    "image_path": "data/met_images/image_436239.jpg"
   },
   {
-    "id": "437728",
-    "objectID": 437728,
-    "title": "Portrait of a Man",
-    "artist": "Spanish (Andalusian) Painter",
-    "summary": "Portrait of a Man. Spanish (Andalusian) Painter. . Oil on canvas.",
-    "image_path": "data/met_images/image_437728.jpg"
+    "id": "436240",
+    "objectID": 436240,
+    "title": "Mrs. John Puget (Catherine Hawkins)",
+    "artist": "Richard Gainsborough Dupont",
+    "summary": "Mrs. John Puget (Catherine Hawkins). Richard Gainsborough Dupont. . Oil on copper.",
+    "image_path": "data/met_images/image_436240.jpg"
   },
   {
-    "id": "437729",
-    "objectID": 437729,
-    "title": "Saint Michael the Archangel",
-    "artist": "Ignacio de Ries",
-    "summary": "Saint Michael the Archangel. Ignacio de Ries. 1640s. Oil on canvas.",
-    "image_path": "data/met_images/image_437729.jpg"
+    "id": "436241",
+    "objectID": 436241,
+    "title": "Cows Crossing a Ford",
+    "artist": "Jules Dupré",
+    "summary": "Cows Crossing a Ford. Jules Dupré. 1836. Oil on canvas.",
+    "image_path": "data/met_images/image_436241.jpg"
   },
   {
-    "id": "437733",
-    "objectID": 437733,
-    "title": "Virgin and Child with the Pietà and Saints",
-    "artist": "Spanish (Castilian) Painter",
-    "summary": "Virgin and Child with the Pietà and Saints. Spanish (Castilian) Painter. . Tempera and gold on wood.",
-    "image_path": "data/met_images/image_437733.jpg"
+    "id": "436242",
+    "objectID": 436242,
+    "title": "Margaret Rieche Richard",
+    "artist": "Dupuy",
+    "summary": "Margaret Rieche Richard. Dupuy. . Enamel.",
+    "image_path": "data/met_images/image_436242.jpg"
   },
   {
-    "id": "437734",
-    "objectID": 437734,
-    "title": "Head of a Man",
-    "artist": "Spanish (Castilian) Painter",
-    "summary": "Head of a Man. Spanish (Castilian) Painter. . Oil on canvas.",
-    "image_path": "data/met_images/image_437734.jpg"
+    "id": "436243",
+    "objectID": 436243,
+    "title": "Salvator Mundi",
+    "artist": "Albrecht Dürer",
+    "summary": "Salvator Mundi. Albrecht Dürer. ca. 1505. Oil on linden.",
+    "image_path": "data/met_images/image_436243.jpg"
   },
   {
-    "id": "437736",
-    "objectID": 437736,
-    "title": "Christ among the Doctors",
-    "artist": "Spanish (Catalan) Painter",
-    "summary": "Christ among the Doctors. Spanish (Catalan) Painter. . Tempera and gold on wood.",
-    "image_path": "data/met_images/image_437736.jpg"
+    "id": "436244",
+    "objectID": 436244,
+    "title": "Virgin and Child with Saint Anne",
+    "artist": "Albrecht Dürer",
+    "summary": "Virgin and Child with Saint Anne. Albrecht Dürer. probably 1519. Oil on linden.",
+    "image_path": "data/met_images/image_436244.jpg"
+  },
+  {
+    "id": "436245",
+    "objectID": 436245,
+    "title": "Virgin and Child",
+    "artist": "Albrecht Dürer",
+    "summary": "Virgin and Child. Albrecht Dürer. 1516. Oil on spruce.",
+    "image_path": "data/met_images/image_436245.jpg"
+  },
+  {
+    "id": "436246",
+    "objectID": 436246,
+    "title": "Portrait of an Italian Woman",
+    "artist": "German Painter",
+    "summary": "Portrait of an Italian Woman. German Painter. . Oil on linden.",
+    "image_path": "data/met_images/image_436246.jpg"
   }
 ]

@@ -9,8 +9,8 @@ BACKEND_URL = "http://localhost:8080/api/model/response"  # Spring Boot 백엔�
 
 def generate_met_image_meta_from_structured():
     structured_path = Path("./data/faiss/met_structured_with_objects.json")
-    image_index_path = Path("./scripts/data/faiss/met_image.index")
-    output_path = Path("./scripts/data/faiss/met_image_meta.json")
+    image_index_path = Path("./data/faiss/met_image.index")
+    output_path = Path("./data/faiss/met_image_meta.json")
 
     if not structured_path.exists():
         raise FileNotFoundError(f"❗ met_structured_with_objects.json 파일이 없습니다: {structured_path}")
@@ -24,11 +24,12 @@ def generate_met_image_meta_from_structured():
         match = re.search(r'(\d+)', full_id)
         image_id = match.group(1) if match else full_id
         for crop in item.get("crops", []):
-            meta.append({
-                "crop_id": crop["crop_id"],
-                "crop_description": crop["crop_description"],
-                "id": f"item_{image_id}"
-            })
+            if crop.get("crop_id") and crop.get("crop_description"):
+                meta.append({
+                    "crop_id": crop["crop_id"],
+                    "crop_description": crop["crop_description"],
+                    "id": f"item_{image_id}"
+                })
 
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(meta, f, indent=2, ensure_ascii=False)
@@ -36,7 +37,7 @@ def generate_met_image_meta_from_structured():
     print(f"✅ met_image_meta.json 생성 완료 ({len(meta)}개 객체)")
 
     if not image_index_path.exists():
-        print("⚠️ met_image.index가 없어 빈 인덱스를 생성합니다.")
+        print("⚠️ met_image.index가 없어 빈 인데스를 생성합니다.")
         dummy_index = faiss.IndexFlatIP(512)
         faiss.write_index(dummy_index, str(image_index_path))
         print("✅ 빈 met_image.index 생성 완료")
@@ -46,7 +47,7 @@ def run(image_path):
 
     yolo = YOLO("yolov8n-seg.pt")
     clip = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
-    processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32", use_fast=True)
+    processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
 
     base_dir = "./data/faiss"
     image_meta_path = f"{base_dir}/met_image_meta.json"
@@ -77,38 +78,20 @@ def run(image_path):
     seg_image = image.copy()
     resized_masks = []
 
-    for i, mask in enumerate(masks):
+    for mask in masks:
         bin_mask = (mask > 0.1).astype(np.uint8)
         bin_mask = cv2.resize(bin_mask, (image.shape[1], image.shape[0]), interpolation=cv2.INTER_NEAREST)
         resized_masks.append(bin_mask)
 
-        color = np.random.randint(0, 255, (3,), dtype=np.uint8)
-        overlay = np.zeros_like(image, dtype=np.uint8)
-        for c in range(3):
-            overlay[:, :, c] = bin_mask * color[c]
-
-        seg_image = cv2.addWeighted(seg_image, 1.0, overlay, 0.4, 0)
-
     def on_touch(event, x, y, flags, param):
-        if event in [cv2.EVENT_LBUTTONDOWN, cv2.EVENT_LBUTTONUP]:
+        if event == cv2.EVENT_LBUTTONDOWN:
             print(f"📱 터치 위치: ({x}, {y})")
-            h, w = seg_image.shape[:2]
-            patch_size = 10
-            for i, bin_mask in enumerate(resized_masks):
-                x_min = max(x - patch_size, 0)
-                x_max = min(x + patch_size, w)
-                y_min = max(y - patch_size, 0)
-                y_max = min(y + patch_size, h)
-                patch = bin_mask[y_min:y_max, x_min:x_max]
-                if np.any(patch == 1):
+            for bin_mask in resized_masks:
+                if bin_mask[y, x] == 1:
                     ys, xs = np.where(bin_mask == 1)
                     if ys.size == 0 or xs.size == 0:
-                        print("❗ 마스크 비어 있음")
+                        print("❗ 마스크 비업")
                         return
-
-                    print("✅ 객체 클릭 인식됨")
-                    cv2.circle(seg_image, (x, y), 10, (0, 255, 0), 2)
-                    cv2.putText(seg_image, "✅ 객체 인식됨", (x + 15, y), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
 
                     crop = image[np.min(ys):np.max(ys), np.min(xs):np.max(xs)]
                     pil = Image.fromarray(cv2.cvtColor(crop, cv2.COLOR_BGR2RGB))
@@ -144,5 +127,5 @@ def run(image_path):
     cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    generate_met_image_meta_from_structured() 
-    run("data/met_images/image_436499.jpg")
+    generate_met_image_meta_from_structured()
+    run("data/met_images/image_436236.jpg")
