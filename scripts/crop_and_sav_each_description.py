@@ -7,7 +7,7 @@ from ultralytics import YOLO
 from dotenv import load_dotenv
 from openai import OpenAI
 
-# ========== 환경 설정 ==========
+# ========== 환경 설정 ========== 
 load_dotenv()
 api_key = os.getenv("OPENAI_API_KEY")
 if not api_key:
@@ -27,8 +27,8 @@ def generate_docent_description(label: str, image_description: str) -> str:
 "{image_description}"
 
 이 객체에 대해 직관적이고 감성적인 도슨트 설명을 작성해 주세요.
-말투는 구어체로, 쉬운 단어와 비유를 사용하고 너무 짧지 않게 설명해 주세요.
-'객체'나 '레이블' 같은 표현은 쓰지 마세요. 무조건 한국어로 하세요.
+말트는 구역체로, 쉬운 단어와 비유를 사용하고 너무 짧지 않게 설명해 주세요.
+'객체'나 '레이블'같은 표현은 쓰지 마세요. 무조건 한국어로 해주세요.
 
 도슨트 설명:
 """
@@ -68,11 +68,17 @@ def process_all_images():
             continue
 
         masks = results.masks.data.cpu().numpy()
+        if results.boxes is None or results.boxes.cls is None:
+            print(f"⚠️ 컨트롤 없음: {image_id}")
+            continue
+
         classes = results.boxes.cls.cpu().numpy().astype(int)
         names = yolo.names
 
         item["crops"] = []
         for idx, mask in enumerate(masks):
+            if idx >= len(classes):
+                continue
             label = names[classes[idx]]
 
             # GPT 설명 생성
@@ -86,6 +92,9 @@ def process_all_images():
             })
             print(f"✅ 생성 완료: {gpt_desc[:40]}...")
 
-    with open(JSON_PATH, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
-    print(f"\n📁 전체 crop 설명 저장 완료: {JSON_PATH}")
+    try:
+        with open(JSON_PATH, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+        print(f"\n📁 전체 crop 설명 저장 완료: {JSON_PATH}")
+    except Exception as e:
+        print(f"❌ JSON 저장 실패: {e}")
