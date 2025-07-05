@@ -2,258 +2,160 @@
   {
     "full_image_id": 436236,
     "full_image_description": "Benjamin Franklin (1706–1790). Joseph Siffred Duplessis. 1778. Oil on canvas.",
+    "image_path": "data/met_images/image_436236.jpg",
     "crops": [
       {
-        "crop_id": "436236_0",
-        "label": "person",
-        "bbox": [
-          114,
-          226,
-          361,
-          632
-        ],
-        "crop_description": "설명 생성 실패"
+        "crop_id": "436236_crop0",
+        "crop_path": "./data/crops\\436236_crop0.jpg",
+        "crop_description": "Benjamin Franklin (1706–1790). Joseph Siffred Duplessis. 1778. Oil on canvas."
       }
     ]
   },
   {
     "full_image_id": 436238,
     "full_image_description": "Benjamin Franklin (1706–1790). Joseph Siffred Duplessis. . Oil on canvas.",
+    "image_path": "data/met_images/image_436238.jpg",
     "crops": [
       {
-        "crop_id": "436238_0",
-        "label": "person",
-        "bbox": [
-          26,
-          85,
-          471,
-          639
-        ],
-        "crop_description": "설명 생성 실패"
+        "crop_id": "436238_crop0",
+        "crop_path": "./data/crops\\436238_crop0.jpg",
+        "crop_description": "Benjamin Franklin (1706–1790). Joseph Siffred Duplessis. 1778. Oil on canvas."
       }
     ]
   },
   {
     "full_image_id": 436239,
     "full_image_description": "Anne Elizabeth Cholmley (1769–1788), Later Lady Mulgrave. Gainsborough Dupont. . Oil on wood.",
+    "image_path": "data/met_images/image_436239.jpg",
     "crops": [
       {
-        "crop_id": "436239_0",
-        "label": "person",
-        "bbox": [
-          82,
-          58,
-          483,
-          601
-        ],
-        "crop_description": "설명 생성 실패"
+        "crop_id": "436239_crop0",
+        "crop_path": "./data/crops\\436239_crop0.jpg",
+        "crop_description": "Anne Elizabeth Cholmley (1769–1788), Later Lady Mulgrave. Gainsborough Dupont. . Oil on wood."
       }
     ]
   },
   {
     "full_image_id": 436240,
     "full_image_description": "Mrs. John Puget (Catherine Hawkins). Richard Gainsborough Dupont. . Oil on copper.",
+    "image_path": "data/met_images/image_436240.jpg",
     "crops": [
       {
-        "crop_id": "436240_0",
-        "label": "person",
-        "bbox": [
-          18,
-          18,
-          473,
-          633
-        ],
-        "crop_description": "설명 생성 실패"
+        "crop_id": "436240_crop0",
+        "crop_path": "./data/crops\\436240_crop0.jpg",
+        "crop_description": "Anne Elizabeth Cholmley (1769–1788), Later Lady Mulgrave. Gainsborough Dupont. . Oil on wood."
       }
     ]
   },
   {
     "full_image_id": 436241,
     "full_image_description": "Cows Crossing a Ford. Jules Dupré. 1836. Oil on canvas.",
+    "image_path": "data/met_images/image_436241.jpg",
     "crops": [
       {
-        "crop_id": "436241_0",
-        "label": "person",
-        "bbox": [
-          174,
-          282,
-          193,
-          337
-        ],
-        "crop_description": "설명 생성 실패"
+        "crop_id": "436241_crop0",
+        "crop_path": "./data/crops\\436241_crop0.jpg",
+        "crop_description": "Salvator Mundi. Albrecht Dürer. ca. 1505. Oil on linden."
       },
       {
-        "crop_id": "436241_1",
-        "label": "horse",
-        "bbox": [
-          58,
-          270,
-          109,
-          321
-        ],
-        "crop_description": "설명 생성 실패"
+        "crop_id": "436241_crop1",
+        "crop_path": "./data/crops\\436241_crop1.jpg",
+        "crop_description": "Cows Crossing a Ford. Jules Dupré. 1836. Oil on canvas."
       },
       {
-        "crop_id": "436241_2",
-        "label": "cow",
-        "bbox": [
-          270,
-          306,
-          309,
-          349
-        ],
-        "crop_description": "설명 생성 실패"
+        "crop_id": "436241_crop2",
+        "crop_path": "./data/crops\\436241_crop2.jpg",
+        "crop_description": "Cows Crossing a Ford. Jules Dupré. 1836. Oil on canvas."
       },
       {
-        "crop_id": "436241_3",
-        "label": "horse",
-        "bbox": [
-          270,
-          306,
-          309,
-          353
-        ],
-        "crop_description": "설명 생성 실패"
+        "crop_id": "436241_crop3",
+        "crop_path": "./data/crops\\436241_crop3.jpg",
+        "crop_description": "Cows Crossing a Ford. Jules Dupré. 1836. Oil on canvas."
       },
       {
-        "crop_id": "436241_4",
-        "label": "dog",
-        "bbox": [
-          94,
-          326,
-          136,
-          348
-        ],
-        "crop_description": "설명 생성 실패"
+        "crop_id": "436241_crop4",
+        "crop_path": "./data/crops\\436241_crop4.jpg",
+        "crop_description": "Margaret Rieche Richard. Dupuy. . Enamel."
       }
     ]
   },
   {
     "full_image_id": 436242,
     "full_image_description": "Margaret Rieche Richard. Dupuy. . Enamel.",
+    "image_path": "data/met_images/image_436242.jpg",
     "crops": [
       {
-        "crop_id": "436242_0",
-        "label": "person",
-        "bbox": [
-          174,
-          194,
-          457,
-          508
-        ],
-        "crop_description": "설명 생성 실패"
+        "crop_id": "436242_crop0",
+        "crop_path": "./data/crops\\436242_crop0.jpg",
+        "crop_description": "Mrs. John Puget (Catherine Hawkins). Richard Gainsborough Dupont. . Oil on copper."
       }
     ]
   },
   {
     "full_image_id": 436243,
     "full_image_description": "Salvator Mundi. Albrecht Dürer. ca. 1505. Oil on linden.",
+    "image_path": "data/met_images/image_436243.jpg",
     "crops": [
       {
-        "crop_id": "436243_0",
-        "label": "person",
-        "bbox": [
-          42,
-          38,
-          501,
-          629
-        ],
-        "crop_description": "설명 생성 실패"
+        "crop_id": "436243_crop0",
+        "crop_path": "./data/crops\\436243_crop0.jpg",
+        "crop_description": "Salvator Mundi. Albrecht Dürer. ca. 1505. Oil on linden."
       }
     ]
   },
   {
     "full_image_id": 436244,
     "full_image_description": "Virgin and Child with Saint Anne. Albrecht Dürer. probably 1519. Oil on linden.",
+    "image_path": "data/met_images/image_436244.jpg",
     "crops": [
       {
-        "crop_id": "436244_0",
-        "label": "person",
-        "bbox": [
-          274,
-          170,
-          528,
-          627
-        ],
-        "crop_description": "설명 생성 실패"
+        "crop_id": "436244_crop0",
+        "crop_path": "./data/crops\\436244_crop0.jpg",
+        "crop_description": "Virgin and Child. Albrecht Dürer. 1516. Oil on spruce."
       },
       {
-        "crop_id": "436244_1",
-        "label": "person",
-        "bbox": [
-          14,
-          34,
-          363,
-          581
-        ],
-        "crop_description": "설명 생성 실패"
+        "crop_id": "436244_crop1",
+        "crop_path": "./data/crops\\436244_crop1.jpg",
+        "crop_description": "Virgin and Child. Albrecht Dürer. 1516. Oil on spruce."
       },
       {
-        "crop_id": "436244_2",
-        "label": "person",
-        "bbox": [
-          18,
-          430,
-          313,
-          628
-        ],
-        "crop_description": "설명 생성 실패"
+        "crop_id": "436244_crop2",
+        "crop_path": "./data/crops\\436244_crop2.jpg",
+        "crop_description": "Virgin and Child. Albrecht Dürer. 1516. Oil on spruce."
       },
       {
-        "crop_id": "436244_3",
-        "label": "person",
-        "bbox": [
-          14,
-          430,
-          469,
-          639
-        ],
-        "crop_description": "설명 생성 실패"
+        "crop_id": "436244_crop3",
+        "crop_path": "./data/crops\\436244_crop3.jpg",
+        "crop_description": "Virgin and Child. Albrecht Dürer. 1516. Oil on spruce."
       }
     ]
   },
   {
     "full_image_id": 436245,
     "full_image_description": "Virgin and Child. Albrecht Dürer. 1516. Oil on spruce.",
+    "image_path": "data/met_images/image_436245.jpg",
     "crops": [
       {
-        "crop_id": "436245_0",
-        "label": "person",
-        "bbox": [
-          46,
-          30,
-          469,
-          633
-        ],
-        "crop_description": "설명 생성 실패"
+        "crop_id": "436245_crop0",
+        "crop_path": "./data/crops\\436245_crop0.jpg",
+        "crop_description": "Virgin and Child. Albrecht Dürer. 1516. Oil on spruce."
       },
       {
-        "crop_id": "436245_1",
-        "label": "teddy bear",
-        "bbox": [
-          114,
-          322,
-          377,
-          601
-        ],
-        "crop_description": "설명 생성 실패"
+        "crop_id": "436245_crop1",
+        "crop_path": "./data/crops\\436245_crop1.jpg",
+        "crop_description": "Virgin and Child. Albrecht Dürer. 1516. Oil on spruce."
       }
     ]
   },
   {
     "full_image_id": 436246,
     "full_image_description": "Portrait of an Italian Woman. German Painter. . Oil on linden.",
+    "image_path": "data/met_images/image_436246.jpg",
     "crops": [
       {
-        "crop_id": "436246_0",
-        "label": "person",
-        "bbox": [
-          22,
-          62,
-          417,
-          625
-        ],
-        "crop_description": "설명 생성 실패"
+        "crop_id": "436246_crop0",
+        "crop_path": "./data/crops\\436246_crop0.jpg",
+        "crop_description": "Salvator Mundi. Albrecht Dürer. ca. 1505. Oil on linden."
       }
     ]
   }
