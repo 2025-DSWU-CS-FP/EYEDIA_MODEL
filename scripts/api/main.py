@@ -1,139 +1,188 @@
 import os
 import json
-import subprocess
-import re
-from typing import Set
-
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+import numpy as np
+import torch
+from PIL import Image
+from ultralytics import YOLO
+from transformers import CLIPProcessor, CLIPModel
+from pathlib import Path
+import cv2
 import requests
-import google.generativeai as genai
+import openai
 from dotenv import load_dotenv
 
-load_dotenv()  # .env에서 환경변수 로딩
-app = FastAPI()
+# ✅ 환경 변수 및 GPT API 세팅
+load_dotenv()
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+BACKEND_OBJECT_DESC_URL = os.getenv("BACKEND_OBJECT_DESC_URL", "http://localhost:8080/api/v1/ai/object-description")
 
-# Spring 서버 주소
-BACKEND_VALIDATION_URL = "http://localhost:8080/api/vi/ai/painting-id"
-BACKEND_RESPONSE_URL = "http://localhost:8080/api/vi/ai/object-description"
-ACCESS_TOKEN = os.getenv("ACCESS_TOKEN") or ""  # 실제 토큰
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+def load_meta(structured_path="data/faiss/met_structured_with_objects.json"):
+    path = Path(structured_path)
+    if not path.exists():
+        raise FileNotFoundError(f"❗ 메타 데이터 파일이 없습니다: {path}")
+    with open(path, "r", encoding="utf-8") as f:
+        structured = json.load(f)
+    meta = []
+    for item in structured:
+        for crop in item.get("crops", []):
+            if crop.get("crop_id") and crop.get("crop_description"):
+                meta.append({
+                    "crop_id": crop["crop_id"],
+                    "crop_description": crop["crop_description"],
+                    "title": item.get("full_image_title", ""),
+                    "artist": item.get("full_image_artist", ""),
+                    "paintingId": item.get("full_image_id", ""),
+                })
+    return meta
 
-if not GEMINI_API_KEY:
-    raise RuntimeError("GEMINI_API_KEY가 .env 파일에 설정되지 않았습니다.")
+def find_clicked_object(masks, x, y, img_shape, mask_shape):
+    scale_x = mask_shape[1] / img_shape[1]
+    scale_y = mask_shape[0] / img_shape[0]
+    mx = int(x * scale_x)
+    my = int(y * scale_y)
+    if 0 <= my < mask_shape[0] and 0 <= mx < mask_shape[1]:
+        for idx, mask in enumerate(masks):
+            if mask[my][mx] > 0:
+                return idx
+    return -1
 
-genai.configure(api_key=GEMINI_API_KEY)
-initialized_images: Set[str] = set()
-STRUCTURE_PATH = "data/met_structure_with_objects.json"
+# ✅ 최신 openai 라이브러리 호환
+def gpt_docent_ko(crop_description: str) -> str:
+    if not OPENAI_API_KEY:
+        raise RuntimeError("OPENAI_API_KEY가 설정되지 않았습니다.")
+    client = openai.OpenAI(api_key=OPENAI_API_KEY)
+    prompt = (
+        "당신은 미술관의 도슨트입니다. 아래 설명을 바탕으로 관람객에게 친절하게 설명해주세요. "
+        "너무 딱딱하거나 기술적이지 않게 풀어서 말해주세요.\n\n"
+        f"[작품 설명]: {crop_description}\n\n"
+        "→ 도슨트 스타일로 설명해주세요:"
+    )
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[{"role": "user", "content": prompt}]
+    )
+    return response.choices[0].message.content.strip()
 
-# 요청 DTO
-class ValidateRequest(BaseModel):
-    paintingId: int
-
-class AnalyzeClickRequest(BaseModel):
-    image_id: str
-    click_index: int = 0
-
-class DescriptionRequest(BaseModel):
-    crop_description: str
-
-def get_docent_description_from_text(crop_description: str) -> str:
-    try:
-        model = genai.GenerativeModel("models/gemini-2.0-flash")
-        prompt = (
-            "당신은 미술관의 도슨트입니다. 아래 설명을 바탕으로 관람객에게 친절하게 설명해주세요. "
-            "너무 딱딱하거나 기술적이지 않게 풀어서 말해주세요.\n\n"
-            f"[작품 설명]: {crop_description}\n\n"
-            "→ 도슨트 스타일로 설명해주세요:"
-        )
-        response = model.generate_content(prompt)
-        return response.text.strip()
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Gemini 도슨트 설명 생성 실패: {e}")
-
-@app.post("/validate/painting-id")
-def validate_painting_id(req: ValidateRequest):
-    try:
-        response = requests.post(
-            BACKEND_VALIDATION_URL,
-            json={"paintingId": req.paintingId},
-            headers={"Authorization": ACCESS_TOKEN}
-        )
-        if response.status_code != 200:
-            raise HTTPException(status_code=400, detail="Spring 서버에서 paintingId 유효하지 않음")
-        return {"status": "valid"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Spring 요청 실패: {e}")
-
-@app.post("/analyze/click")
-def analyze_click(req: AnalyzeClickRequest):
-    full_image_id = f"image_{req.image_id}"
-    image_path = f"data/met_images/{full_image_id}.jpg"
-    crop_id = f"{full_image_id}_crop{req.click_index}.jpg"
-    crop_path = f"data/cropped_images/{crop_id}"
-
+def detect_and_send_crop(image_path):
+    print(f"▶ 이미지 경로: {image_path}")
     if not os.path.exists(image_path):
-        raise HTTPException(status_code=404, detail=f"원본 이미지 없음: {image_path}")
+        print("❗ 이미지 경로가 존재하지 않음")
+        return
 
-    if req.image_id not in initialized_images:
-        try:
-            subprocess.run(["python", "scripts/fetch_text_and_build_faiss.py"], check=True)
-            subprocess.run(["python", "scripts/click_and_find_faiss_seg.py", image_path], check=True)
-            subprocess.run(["python", "scripts/crop_and_sav_each_description.py", image_path], check=True)
-            initialized_images.add(req.image_id)
-        except subprocess.CalledProcessError as e:
-            raise HTTPException(status_code=500, detail=f"❌ 스크립트 실행 실패: {e}")
+    image = cv2.imread(image_path)
+    if image is None:
+        print("❗ 이미지 로드 실패")
+        return
+    image = cv2.resize(image, (1280, 720))
 
-    if not os.path.exists(crop_path):
-        raise HTTPException(status_code=404, detail=f"Crop 이미지 없음: {crop_path}")
+    yolo = YOLO("yolov8n-seg.pt")
+    results = yolo(image, conf=0.3)[0]
 
-    try:
-        with open(STRUCTURE_PATH, "r", encoding="utf-8") as f:
-            all_data = json.load(f)
+    if results.masks is None or results.boxes is None:
+        print("❗ 감지된 객체가 없습니다.")
+        return
 
-        matched_description = "설명 없음"
-        for item in all_data:
-            if str(item["full_image_id"]) == req.image_id:
-                for crop in item.get("crops", []):
-                    if crop["crop_id"] == crop_id:
-                        matched_description = crop.get("crop_description", "설명 없음")
-                        break
-                break
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"설명 추출 실패: {e}")
+    masks_np = results.masks.data.cpu().numpy()
+    mask_shape = masks_np[0].shape
 
-    # ⚠️ 안전하게 paintingId 변환
-    try:
-        painting_id = int(re.sub(r"\D", "", req.image_id))  # "435638"
-    except:
-        raise HTTPException(status_code=400, detail="image_id에서 paintingId 추출 실패")
+    clip = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
+    processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    clip.to(device)
 
-    result_payload = {
-        "paintingId": painting_id,
-        "cropId": crop_id,
-        "description": matched_description
-    }
-    headers = {
-        "Authorization": ACCESS_TOKEN,
-        "Content-Type": "application/json"
-    }
-    response = requests.post(BACKEND_RESPONSE_URL, json=result_payload, headers=headers)
+    crop_meta = load_meta()
+    def embed(img):
+        inputs = processor(images=img, return_tensors="pt").to(device)
+        with torch.no_grad():
+            emb = clip.get_image_features(**inputs)
+            emb = emb / emb.norm(dim=-1, keepdim=True)
+        return emb.cpu().numpy().astype("float32").squeeze()
 
-    if response.status_code != 200:
-        raise HTTPException(
-            status_code=response.status_code,
-            detail=f"Spring 전송 실패: {response.status_code} {response.text}"
-        )
+    selected_idx = -1
+    crop_result = {}
 
-    return {
-        "status": "ok",
-        "crop_id": crop_id,
-        "description": matched_description,
-        "backend_response": response.json()
-    }
+    def on_click(event, x, y, flags, param):
+        nonlocal selected_idx
+        if event == cv2.EVENT_LBUTTONDOWN:
+            img_shape = (vis.shape[0], vis.shape[1])
+            idx = find_clicked_object(masks_np, x, y, img_shape, mask_shape)
+            if idx >= 0:
+                selected_idx = idx
 
-# ✅ Gemini 설명 생성 테스트 엔드포인트 -- 테스트용이므로 잘 개발되면 이 코드 지워주세요
-@app.post("/test/gemini")
-def test_gemini(req: DescriptionRequest):
-    result = get_docent_description_from_text(req.crop_description)
-    return {"docent_description": result}
+    cv2.namedWindow("YOLO", cv2.WINDOW_NORMAL)
+    cv2.resizeWindow("YOLO", 1280, 720)
+    cv2.setMouseCallback("YOLO", on_click)
+
+    while True:
+        vis = image.copy()
+        for i, mask_np in enumerate(masks_np):
+            mask_resized = cv2.resize(mask_np, (vis.shape[1], vis.shape[0]), interpolation=cv2.INTER_NEAREST)
+            binary_mask = mask_resized.astype(bool)
+            color = (0, 255, 0) if i == selected_idx else (0, 0, 255)
+            vis[binary_mask] = color
+        cv2.imshow("YOLO", vis)
+
+        key = cv2.waitKey(30) & 0xFF
+        if key == ord('q'):
+            print("🛑 종료 요청")
+            cv2.destroyAllWindows()
+            return
+
+        if selected_idx >= 0:
+            x1, y1, x2, y2 = results.boxes.xyxy[selected_idx].int().tolist()
+            cropped = image[y1:y2, x1:x2]
+            pil_crop = Image.fromarray(cv2.cvtColor(cropped, cv2.COLOR_BGR2RGB))
+            vec = embed(pil_crop)
+
+            crops_dir = Path("data/crops/")
+            crop_files = list(crops_dir.glob("*.jpg"))
+            best_match = None
+            max_score = -float('inf')
+            for meta in crop_meta:
+                crop_img_path = f"data/crops/{meta['crop_id']}.jpg"
+                if not os.path.exists(crop_img_path):
+                    continue
+                try:
+                    crop_img = Image.open(crop_img_path)
+                    desc_embedding = embed(crop_img)
+                    if desc_embedding.shape != vec.shape:
+                        continue
+                    score = float(np.dot(vec, desc_embedding))
+                    if score > max_score:
+                        max_score = score
+                        best_match = meta
+                except Exception:
+                    continue
+
+            if best_match is None or max_score < 0.0:
+                print("❌ 유사한 crop을 찾지 못했습니다.")
+                selected_idx = -1
+                continue
+
+            # 1️⃣ GPT 증강
+            docent_description = gpt_docent_ko(best_match["crop_description"])
+            print(f"[GPT 도슨트 설명]\n{docent_description}")
+
+            # 2️⃣ 백엔드로 전송
+            payload = {
+                "objectId": best_match["crop_id"],
+                "description": docent_description,
+                "imageurl": image_path,
+                "title": best_match.get("title", ""),
+                "artist": best_match.get("artist", ""),
+                "paintingId": best_match["paintingId"]
+            }
+            print(f"[POST] {BACKEND_OBJECT_DESC_URL}\n{json.dumps(payload, ensure_ascii=False, indent=2)}")
+            try:
+                res = requests.post(BACKEND_OBJECT_DESC_URL, json=payload)
+                print(f"[INFO] 백엔드 응답: {res.status_code} - {res.text}")
+            except Exception as e:
+                print(f"[ERROR] 백엔드 요청 실패: {e}")
+
+            cv2.destroyAllWindows()
+            break
+
+    return
+
+if __name__ == "__main__":
+    detect_and_send_crop("data/met_images/image_436238.jpg")
