@@ -1,141 +1,100 @@
 import os
 import json
 import cv2
-import numpy as np
-from PIL import Image
-from pathlib import Path
+import faiss
 import torch
+from PIL import Image
 from ultralytics import YOLO
-from sentence_transformers import SentenceTransformer, util
-import google.generativeai as genai
-from dotenv import load_dotenv
+from transformers import CLIPProcessor, CLIPModel
 
-# 📌 환경변수에서 Gemini API 키 불러오기
-load_dotenv()
-api_key = os.getenv("GEMINI_API_KEY")
-if not api_key:
-    raise ValueError("❗ 환경 변수 'GEMINI_API_KEY'가 설정되지 않았습니다.")
-genai.configure(api_key=api_key)
-gemini_model = genai.GenerativeModel("models/gemini-2.0-flash")
+# 경로 설정
+DATA_PATH = "./data/faiss/met_structured_with_objects.json"
+CROP_DIR = "./data/crops"
+FAISS_INDEX_PATH = "./data/faiss/met_text.index"
+META_PATH = "./data/faiss/met_text_meta.json"
 
-def generate_docent_description_gemini(label: str, description: str) -> str:
-    prompt = f"""
-당신은 예술작품을 설명하는 한국어 도슨트입니다.
+# 디렉토리 준비
+os.makedirs(CROP_DIR, exist_ok=True)
 
-주어진 정보를 바탕으로 '{label}'에 대한 감성적이고 직관적인 설명을 관람객에게 전달해 주세요.
-말투는 구어체이며, 쉬운 단어와 비유를 사용하고 최대한 자세하게 설명해주세요. 
-이것을 person이라고 부르기로 했어요 등의 label에 대한 직접적인 언급은 하지 마세요. 
+# 모델 로딩
+print("YOLO 로딩 중...")
+yolo = YOLO("yolov8n-seg.pt")
+print("CLIP 로딩 중...")
+clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
+clip_processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
+device = "cuda" if torch.cuda.is_available() else "cpu"
+clip_model.to(device)
+print(f"모델 준비 완료 (device: {device})")
 
-[정보]
-- 객체 이름: {label}
-- 객체 설명: {description}
+# summary(객체 설명) 메타데이터 및 FAISS index 로드
+print("FAISS 및 메타데이터 로딩 중...")
+with open(META_PATH, "r", encoding="utf-8") as f:
+    meta = json.load(f)
+summaries = [entry["summary"] for entry in meta]
+faiss_index = faiss.read_index(FAISS_INDEX_PATH)
+print("준비 완료.\n")
 
-도슨트 설명:
-"""
-    try:
-        response = gemini_model.generate_content(prompt)
-        return response.text.strip()
-    except Exception as e:
-        print(f"❗ Gemini 설명 생성 실패: {e}")
-        return description
+def embed_image(img_path):
+    """이미지 임베딩(512-dim 벡터) 생성"""
+    pil = Image.open(img_path).convert("RGB")
+    inputs = clip_processor(images=pil, return_tensors="pt").to(device)
+    with torch.no_grad():
+        emb = clip_model.get_image_features(**inputs)
+    emb = emb / emb.norm(dim=-1, keepdim=True)
+    return emb.cpu().numpy().astype("float32")
 
-def crop_and_update_structured():
-    image_dir = Path("data/met_images")
-    crop_dir = Path("data/cropped_images")
-    faiss_dir = Path("data/faiss")
-    structured_path = faiss_dir / "met_structured_with_objects.json"
-    output_path = faiss_dir / "met_structured_with_objects.json"
+def crop_and_describe_objects(item):
+    """한 이미지에서 crop 및 설명 생성"""
+    image_path = item.get("image_path", "")
+    if not os.path.exists(image_path):
+        print(f"  [이미지 없음] {image_path}")
+        return []
 
-    image_dir.mkdir(parents=True, exist_ok=True)
-    crop_dir.mkdir(parents=True, exist_ok=True)
-    faiss_dir.mkdir(parents=True, exist_ok=True)
+    image = cv2.imread(image_path)
+    if image is None:
+        print(f"  [이미지 읽기 실패] {image_path}")
+        return []
 
-    if not structured_path.exists():
-        print(f"{structured_path} 파일이 없어 기본 템플릿 생성")
-        with open(structured_path, "w", encoding="utf-8") as f:
-            json.dump([], f, indent=2, ensure_ascii=False)
+    results = yolo(image)[0]
+    n_boxes = len(results.boxes)
+    print(f"  [YOLO] 객체 {n_boxes}개 감지됨")
+    crops = []
 
-    print("🔄 모델 불러오는 중...")
-    try:
-        yolo = YOLO("yolov8n-seg.pt")
-        sbert = SentenceTransformer("snunlp/KR-SBERT-V40K-klueNLI-augSTS")
-    except Exception as e:
-        print(f"모델 로딩 실패: {e}")
-        return
+    if n_boxes == 0:
+        print("    [!] 객체가 감지되지 않음 (crop 생성 안됨)")
+        return []
 
-    with open(structured_path, "r", encoding="utf-8") as f:
-        structured_data = json.load(f)
+    for i, box in enumerate(results.boxes.xyxy.cpu().numpy()):
+        x1, y1, x2, y2 = map(int, box)
+        crop_img = image[y1:y2, x1:x2]
+        crop_id = f"{item['full_image_id']}_crop{i}"
+        crop_path = os.path.join(CROP_DIR, f"{crop_id}.jpg")
+        cv2.imwrite(crop_path, crop_img)
 
-    if not structured_data:
-        print("메타데이터가 비어 있습니다. crop 생성 없이 종료됩니다.")
-        return
+        # crop 임베딩 → 유사 summary 검색
+        emb = embed_image(crop_path)
+        D, I = faiss_index.search(emb, 1)
+        summary = summaries[I[0][0]]
 
-    for item in structured_data:
-        full_image_id = item["full_image_id"]
-        img_path = image_dir / f"image_{full_image_id}.jpg"
-        img = cv2.imread(str(img_path))
+        print(f"    [{i}] crop 저장: {crop_path} | crop_description: {summary[:40]}...")
+        crops.append({
+            "crop_id": crop_id,
+            "crop_path": crop_path,
+            "crop_description": summary
+        })
+    return crops
 
-        if img is None:
-            print(f"이미지 로드 실패: {img_path}")
-            continue
-
-        full_desc_text = item.get("full_image_description", "")
-        if not full_desc_text:
-            print(f"설명 없음: {full_image_id}")
-            continue
-
-        description_sentences = [s.strip() for s in full_desc_text.replace("**", "").split(".") if s.strip()]
-        if not description_sentences:
-            print(f"설명 문장이 없음: {full_image_id}")
-            continue
-
-        sentence_embeddings = sbert.encode(description_sentences, convert_to_tensor=True)
-        img_resized = cv2.resize(img, (1280, 720))
-        results = yolo(img_resized, conf=0.3)[0]
-
-        if not results.masks:
-            print(f"객체 감지 실패: {full_image_id}")
-            continue
-
-        item["crops"] = []
-        class_names = results.names
-        masks = results.masks.data.cpu().numpy()
-        classes = results.boxes.cls.cpu().numpy().astype(int)
-
-        labels = list(set([class_names[idx] for idx in classes]))
-        description_map = {}
-        for label in labels:
-            query_embedding = sbert.encode(label, convert_to_tensor=True)
-            cos_scores = util.cos_sim(query_embedding, sentence_embeddings)[0]
-            top_indices = torch.topk(cos_scores, k=min(2, len(cos_scores))).indices.tolist()
-            raw_description = " ".join([description_sentences[i] for i in top_indices])
-            enriched_description = generate_docent_description_gemini(label, raw_description)
-            description_map[label] = enriched_description
-
-        label_count = {}
-        for i, (mask, cls_idx) in enumerate(zip(masks, classes)):
-            bin_mask = (mask > 0.5).astype(np.uint8)
-            ys, xs = np.where(bin_mask == 1)
-            if ys.size == 0 or xs.size == 0:
-                continue
-
-            cropped = img_resized[np.min(ys):np.max(ys), np.min(xs):np.max(xs)]
-            label = class_names[cls_idx]
-            label_count[label] = label_count.get(label, 0) + 1
-            crop_name = f"image_{full_image_id}_crop{label_count[label]}.jpg"
-            crop_path = crop_dir / crop_name
-            cv2.imwrite(str(crop_path), cropped)
-
-            item["crops"].append({
-                "crop_id": crop_name,
-                "crop_description": description_map.get(label, "")
-            })
-
-    with open(output_path, "w", encoding="utf-8") as f:
-        json.dump(structured_data, f, indent=2, ensure_ascii=False)
-
-    print(f"✅ 객체 정보가 {output_path.name} 에 저장되었습니다.")
-    print(f"🔢 총 {sum(len(i['crops']) for i in structured_data)}개의 crop 객체가 생성되었습니다.")
+def run():
+    # 전체 데이터 로드 및 crop 생성
+    with open(DATA_PATH, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    print(f"총 {len(data)}개 이미지에서 crop 및 설명 생성 시작!\n")
+    for idx, item in enumerate(data):
+        print(f"[{idx+1}/{len(data)}] 이미지: {item.get('image_path', '')}")
+        item["crops"] = crop_and_describe_objects(item)
+    with open(DATA_PATH, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+    print("\n✅ crop 생성 및 유사 객체 기반 설명 자동 생성 완료")
 
 if __name__ == "__main__":
-    crop_and_update_structured()
+    run()

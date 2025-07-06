@@ -1,154 +1,187 @@
-import cv2, json, numpy as np, torch, faiss, os
+import os
+import json
+import numpy as np
+import torch
 from PIL import Image
 from ultralytics import YOLO
 from transformers import CLIPProcessor, CLIPModel
 from pathlib import Path
+import cv2
 import requests
-import time
+import openai
+from dotenv import load_dotenv
 
-OBJECT_DESC_URL = "http://localhost:8080/api/v1/ai/object-description"
+# 환경 변수 및 GPT API 세팅
+load_dotenv()
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+BACKEND_OBJECT_DESC_URL = os.getenv("BACKEND_OBJECT_DESC_URL", "http://localhost:8080/api/v1/ai/object-description")
 
-def load_meta():
-    structured_path = Path("./data/faiss/met_structured_with_objects.json")
-    meta_path = Path("./data/faiss/met_text_meta.json")
-
-    if not structured_path.exists() or not meta_path.exists():
-        raise FileNotFoundError("❗ 메타 데이터 파일이 없습니다.")
-
-    with open(structured_path, "r", encoding="utf-8") as f1:
-        structured = json.load(f1)
-    with open(meta_path, "r", encoding="utf-8") as f2:
-        text_meta = json.load(f2)
-
-    meta_lookup = {str(entry["id"]): entry for entry in text_meta}
-    crop_meta = []
-
+def load_meta(structured_path="data/faiss/met_structured_with_objects.json"):
+    path = Path(structured_path)
+    if not path.exists():
+        raise FileNotFoundError(f"❗ 메타 데이터 파일이 없습니다: {path}")
+    with open(path, "r", encoding="utf-8") as f:
+        structured = json.load(f)
+    meta = []
     for item in structured:
-        full_id = str(item["full_image_id"])
-        matched_meta = meta_lookup.get(full_id, {})
         for crop in item.get("crops", []):
-            if "crop_description" not in crop:
-                continue
-            crop_meta.append({
-                "crop_id": crop["crop_id"],
-                "crop_description": crop["crop_description"],
-                "full_image_id": full_id,
-                "artist": matched_meta.get("artist", "unknown"),
-                "title": matched_meta.get("title", "untitled"),
-                "paintingId": int(full_id)
-            })
-    return crop_meta
+            if crop.get("crop_id") and crop.get("crop_description"):
+                meta.append({
+                    "crop_id": crop["crop_id"],
+                    "crop_description": crop["crop_description"],
+                    "title": item.get("full_image_title", ""),
+                    "artist": item.get("full_image_artist", ""),
+                    "paintingId": item.get("full_image_id", ""),
+                })
+    return meta
 
-def run(image_path):
+def find_clicked_object(masks, x, y, img_shape, mask_shape):
+    scale_x = mask_shape[1] / img_shape[1]
+    scale_y = mask_shape[0] / img_shape[0]
+    mx = int(x * scale_x)
+    my = int(y * scale_y)
+    if 0 <= my < mask_shape[0] and 0 <= mx < mask_shape[1]:
+        for idx, mask in enumerate(masks):
+            if mask[my][mx] > 0:
+                return idx
+    return -1
+
+def gpt_docent_ko(crop_description: str) -> str:
+    if not OPENAI_API_KEY:
+        raise RuntimeError("OPENAI_API_KEY가 설정되지 않았습니다.")
+    openai.api_key = OPENAI_API_KEY
+    prompt = (
+        "당신은 미술관의 도슨트입니다. 아래 설명을 바탕으로 관람객에게 친절하게 설명해주세요. "
+        "너무 딱딱하거나 기술적이지 않게 풀어서 말해주세요.\n\n"
+        f"[작품 설명]: {crop_description}\n\n"
+        "→ 도슨트 스타일로 설명해주세요:"
+    )
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[{"role": "user", "content": prompt}]
+    )
+    return response["choices"][0]["message"]["content"].strip()
+
+def detect_and_send_crop(image_path):
+    print(f"▶ 이미지 경로: {image_path}")
     if not os.path.exists(image_path):
-        raise FileNotFoundError(f"❗ 이미지 없음: {image_path}")
+        print("❗ 이미지 경로가 존재하지 않음")
+        return
+
+    image = cv2.imread(image_path)
+    if image is None:
+        print("❗ 이미지 로드 실패")
+        return
+    image = cv2.resize(image, (1280, 720))
 
     yolo = YOLO("yolov8n-seg.pt")
+    results = yolo(image, conf=0.3)[0]
+
+    if results.masks is None or results.boxes is None:
+        print("❗ 감지된 객체가 없습니다.")
+        return
+
+    masks_np = results.masks.data.cpu().numpy()
+    mask_shape = masks_np[0].shape
+
     clip = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
     processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
     device = "cuda" if torch.cuda.is_available() else "cpu"
     clip.to(device)
 
-    index_path = "./data/faiss/met_crop.index"
-    if not os.path.exists(index_path):
-        raise FileNotFoundError("❗ met_crop.index 없음")
-    index = faiss.read_index(index_path)
     crop_meta = load_meta()
-
     def embed(img):
         inputs = processor(images=img, return_tensors="pt").to(device)
         with torch.no_grad():
             emb = clip.get_image_features(**inputs)
             emb = emb / emb.norm(dim=-1, keepdim=True)
-        return emb.cpu().numpy().astype("float32")
+        return emb.cpu().numpy().astype("float32").squeeze()
 
-    image = cv2.imread(image_path)
-    if image is None:
-        raise FileNotFoundError("❗ 이미지 로딩 실패")
-    image = cv2.resize(image, (1280, 720))
+    selected_idx = -1
+    crop_result = {}
 
-    results = yolo(image, conf=0.3)[0]
-    masks = results.masks.data.cpu().numpy() if results.masks else []
+    def on_click(event, x, y, flags, param):
+        nonlocal selected_idx
+        if event == cv2.EVENT_LBUTTONDOWN:
+            img_shape = (vis.shape[0], vis.shape[1])
+            idx = find_clicked_object(masks_np, x, y, img_shape, mask_shape)
+            if idx >= 0:
+                selected_idx = idx
 
-    seg_image = image.copy()
-    resized_masks = []
-
-    for mask in masks:
-        bin_mask = (mask > 0.1).astype(np.uint8)
-        bin_mask = cv2.resize(bin_mask, (image.shape[1], image.shape[0]), interpolation=cv2.INTER_NEAREST)
-        resized_masks.append(bin_mask)
-
-        color = np.random.randint(0, 255, (3,), dtype=np.uint8)
-        overlay = np.zeros_like(image, dtype=np.uint8)
-        for c in range(3):
-            overlay[:, :, c] = bin_mask * color[c]
-        seg_image = cv2.addWeighted(seg_image, 1.0, overlay, 0.4, 0)
-
-    last_click_time = 0
-    click_delay = 0.5
-
-    def on_touch(event, x, y, flags, param):
-        nonlocal last_click_time
-
-        current_time = time.time()
-        if event != cv2.EVENT_LBUTTONDOWN:
-            return
-        if current_time - last_click_time < click_delay:
-            return
-        last_click_time = current_time
-
-        print(f"\n🖱 클릭 위치: ({x}, {y})")
-        patch_size = 10
-        h, w = seg_image.shape[:2]
-
-        for bin_mask in resized_masks:
-            x_min, x_max = max(x - patch_size, 0), min(x + patch_size, w)
-            y_min, y_max = max(y - patch_size, 0), min(y + patch_size, h)
-            patch = bin_mask[y_min:y_max, x_min:x_max]
-
-            if np.any(patch == 1):
-                ys, xs = np.where(bin_mask == 1)
-                if ys.size == 0 or xs.size == 0:
-                    return
-
-                crop = image[np.min(ys):np.max(ys), np.min(xs):np.max(xs)]
-                pil = Image.fromarray(cv2.cvtColor(crop, cv2.COLOR_BGR2RGB))
-                emb = embed(pil)
-
-                _, idx = index.search(emb, 1)
-                if idx[0][0] < 0 or idx[0][0] >= len(crop_meta):
-                    print("❗ 검색 결과 무효")
-                    return
-
-                matched = crop_meta[idx[0][0]]
-                payload = {
-                    "objectId": matched["crop_id"],
-                    "description": matched["crop_description"],
-                    "imageurl": "http://example.com/image.jpg",
-                    "title": matched["title"],
-                    "artist": matched["artist"],
-                    "paintingId": matched["paintingId"]
-                }
-
-                print("📦 보내는 JSON:", json.dumps(payload, indent=2, ensure_ascii=False))
-                try:
-                    res2 = requests.post(OBJECT_DESC_URL, json=payload)
-                    print(f"📤 설명 등록 응답: {res2.status_code} {res2.text}")
-                except Exception as e:
-                    print(f"❌ 설명 전송 실패: {e}")
-                return
-        print("❌ 클릭한 위치에 객체 없음")
-
-    cv2.namedWindow("met viewer")
-    cv2.setMouseCallback("met viewer", on_touch)
+    cv2.namedWindow("YOLO", cv2.WINDOW_NORMAL)
+    cv2.resizeWindow("YOLO", 1280, 720)
+    cv2.setMouseCallback("YOLO", on_click)
 
     while True:
-        cv2.imshow("met viewer", seg_image)
-        if cv2.waitKey(1) & 0xFF == 27:
+        vis = image.copy()
+        for i, mask_np in enumerate(masks_np):
+            mask_resized = cv2.resize(mask_np, (vis.shape[1], vis.shape[0]), interpolation=cv2.INTER_NEAREST)
+            binary_mask = mask_resized.astype(bool)
+            color = (0, 255, 0) if i == selected_idx else (0, 0, 255)
+            vis[binary_mask] = color
+        cv2.imshow("YOLO", vis)
+
+        key = cv2.waitKey(30) & 0xFF
+        if key == ord('q'):
+            print("🛑 종료 요청")
+            cv2.destroyAllWindows()
+            return
+
+        if selected_idx >= 0:
+            x1, y1, x2, y2 = results.boxes.xyxy[selected_idx].int().tolist()
+            cropped = image[y1:y2, x1:x2]
+            pil_crop = Image.fromarray(cv2.cvtColor(cropped, cv2.COLOR_BGR2RGB))
+            vec = embed(pil_crop)
+
+            crops_dir = Path("data/crops/")
+            crop_files = list(crops_dir.glob("*.jpg"))
+            best_match = None
+            max_score = -float('inf')
+            for meta in crop_meta:
+                crop_img_path = f"data/crops/{meta['crop_id']}.jpg"
+                if not os.path.exists(crop_img_path):
+                    continue
+                try:
+                    crop_img = Image.open(crop_img_path)
+                    desc_embedding = embed(crop_img)
+                    if desc_embedding.shape != vec.shape:
+                        continue
+                    score = float(np.dot(vec, desc_embedding))
+                    if score > max_score:
+                        max_score = score
+                        best_match = meta
+                except Exception:
+                    continue
+
+            if best_match is None or max_score < 0.0:
+                print("❌ 유사한 crop을 찾지 못했습니다.")
+                selected_idx = -1
+                continue
+
+            # 1️⃣ GPT 증강
+            docent_description = gpt_docent_ko(best_match["crop_description"])
+            print(f"[GPT 도슨트 설명]\n{docent_description}")
+
+            # 2️⃣ 백엔드로 전송
+            payload = {
+                "objectId": best_match["crop_id"],
+                "description": docent_description,
+                "imageurl": image_path,
+                "title": best_match.get("title", ""),
+                "artist": best_match.get("artist", ""),
+                "paintingId": best_match["paintingId"]
+            }
+            print(f"[POST] {BACKEND_OBJECT_DESC_URL}\n{json.dumps(payload, ensure_ascii=False, indent=2)}")
+            try:
+                res = requests.post(BACKEND_OBJECT_DESC_URL, json=payload)
+                print(f"[INFO] 백엔드 응답: {res.status_code} - {res.text}")
+            except Exception as e:
+                print(f"[ERROR] 백엔드 요청 실패: {e}")
+
+            cv2.destroyAllWindows()
             break
-    cv2.destroyAllWindows()
+
+    return
 
 if __name__ == "__main__":
-    test_image_id = "436419"
-    image_path = f"./data/met_images/image_{test_image_id}.jpg"
-    run(image_path)
+    detect_and_send_crop("data/met_images/image_436238.jpg")
