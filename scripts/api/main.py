@@ -85,7 +85,7 @@ def send_image_to_backend(image_file_path, exhibition, title):
         }
         res = requests.post(f"{BACKEND_URL}/upload", files=files, data=data)
         res.raise_for_status()
-        return res.json()["data"] # ApiResponse 구조 기준
+        return res.json()["result"] # ApiResponse 구조 기준
 
 # ✅ 백엔드: 메타데이터 저장 API 호출
 def send_metadata_to_backend(image_url, artwork):
@@ -97,8 +97,8 @@ def send_metadata_to_backend(image_url, artwork):
         "exhibition": artwork["exhibition"],
         "imageUrl": image_url
     }
-    print(f"[POST] {BACKEND_URL}/metadata\nPayload: {json.dumps(payload, ensure_ascii=False, indent=2)}")
-    res = requests.post(f"{BACKEND_URL}/metadata", json=payload)
+    print(f"[POST] {BACKEND_URL}/save\nPayload: {json.dumps(payload, ensure_ascii=False, indent=2)}")
+    res = requests.post(f"{BACKEND_URL}/save", json=payload)
     res.raise_for_status()
     return res.json()
 

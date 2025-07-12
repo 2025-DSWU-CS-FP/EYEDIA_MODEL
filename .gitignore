@@ -43,4 +43,4 @@ __pycache__/
 .idea/
 .env
 scripts/data/
-/temp/
+/temp/*
