@@ -14,6 +14,8 @@ from fastapi.responses import JSONResponse
 
 # 환경 변수 로드
 load_dotenv()
+print("[✅] OPENAI_API_KEY =", os.getenv("OPENAI_API_KEY"))
+
 BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8080/api/v1/paintings")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 
@@ -120,6 +122,7 @@ def send_metadata_to_backend(image_url, artwork):
 @app.post("/process-image")
 async def process_uploaded_image(file: UploadFile):
     try:
+        # os.makedirs("temp", exist_ok=True)
         # 업로드 이미지 저장
         save_path = f"temp/{file.filename}"
         with open(save_path, "wb") as f:

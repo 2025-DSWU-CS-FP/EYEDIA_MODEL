@@ -50,13 +50,20 @@ def crop_and_describe_objects(item):
         print(f"  [이미지 없음] {image_path}")
         return []
     
-    image = cv2.imread(image_path)
-    if image is None:
+    image_bgr = cv2.imread(image_path)
+    if image_bgr is None:
         print(f"  [이미지 읽기 실패] {image_path}")
         return []
-    
-    h, w, _ = image.shape
+
+    h, w, _ = image_bgr.shape
     print(f"[INFO] 원본 이미지 크기: {w}x{h}")
+
+    image_rgb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
+    image_pil = Image.fromarray(image_rgb)
+    results = yolo(image_pil)[0]  # 🔥 여기서 크래시 방지됨
+
+    image = image_bgr  # 이후 crop에 사용
+
 
     results = yolo(image)[0]
     n_boxes = len(results.boxes)
@@ -66,26 +73,7 @@ def crop_and_describe_objects(item):
     if n_boxes == 0:
         print("    [!] 객체가 감지되지 않음 (crop 생성 안됨)")
         return []
-    '''
-    for i, box in enumerate(results.boxes.xyxy.cpu().numpy()):
-        x1, y1, x2, y2 = map(int, box)
-        crop_img = image[y1:y2, x1:x2]
-        crop_id = f"{item['full_image_id']}_crop{i}"
-        crop_path = os.path.join(CROP_DIR, f"{crop_id}.jpg")
-        cv2.imwrite(crop_path, crop_img)
 
-        # crop 임베딩 → 유사 summary 검색
-        emb = embed_image(crop_path)
-        D, I = faiss_index.search(emb, 1)
-        summary = summaries[I[0][0]]
-
-        print(f"    [{i}] crop 저장: {crop_path} | crop_description: {summary[:40]}...")
-        crops.append({
-            "crop_id": crop_id,
-            "crop_path": crop_path,
-            "crop_description": summary
-        })
-    '''
     for i, box in enumerate(results.boxes.xyxy.cpu().numpy()):
         x1, y1, x2, y2 = map(int, box)
 
@@ -116,13 +104,13 @@ def crop_and_describe_objects(item):
         h, w, _ = image.shape
 
         if cx < w / 2 and cy < h / 2:
-            quadrant = "Q1"
+            quadrant = "top-left"
         elif cx >= w / 2 and cy < h / 2:
-            quadrant = "Q2"
+            quadrant = "top-right"
         elif cx < w / 2 and cy >= h / 2:
-            quadrant = "Q3"
+            quadrant = "bottom-left"
         else:
-            quadrant = "Q4"
+            quadrant = "bottom-right"
 
         print(f"    [{i}] crop 저장: {crop_path} | quadrant: {quadrant} | crop_description: {summary[:40]}...")
         crops.append({
