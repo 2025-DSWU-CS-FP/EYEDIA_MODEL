@@ -1,6 +1,6 @@
 ./logs/
 *.png
-
+data/cropped_images/
 *.pt
 
 *.jpg
@@ -18,6 +18,13 @@ models/
 !models/README.md  # 만약 모델 설명을 위한 문서가 있다면 예외 처리
 
 # 🔹 데이터
+data/crops
+data/met_images/
+data/faiss/
+data/uploaed_videos/
+data/faiss/met_text.index
+data/faiss/met_text_meta.json
+data/faiss/met_structured_with_objects.json
 data/crops
 data/met_images/
 data/faiss/
@@ -45,3 +52,10 @@ __pycache__/
 scripts/data/
 /temp/*
 data/cropped_images/
+
+# Virtual environment
+venv/
+# Temporary files
+/temp/*
+# wik test img
+data/wiki_images/

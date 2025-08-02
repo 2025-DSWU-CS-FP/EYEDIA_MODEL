@@ -1,139 +1,161 @@
 import os
 import json
-import subprocess
-import re
-from typing import Set
-
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+import traceback
+import numpy as np
+import torch
+from PIL import Image
+from transformers import CLIPProcessor, CLIPModel
+from pathlib import Path
 import requests
-import google.generativeai as genai
+import openai
 from dotenv import load_dotenv
+from fastapi import FastAPI, UploadFile
+from fastapi.responses import JSONResponse
 
-load_dotenv()  # .env에서 환경변수 로딩
+# 환경 변수 로드
+load_dotenv()
+BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8080/api/v1/paintings")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+
 app = FastAPI()
 
-# Spring 서버 주소
-BACKEND_VALIDATION_URL = "http://localhost:8080/api/vi/ai/painting-id"
-BACKEND_RESPONSE_URL = "http://localhost:8080/api/vi/ai/object-description"
-ACCESS_TOKEN = os.getenv("ACCESS_TOKEN") or ""  # 실제 토큰
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+# CLIP 모델 초기화
+clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
+clip_processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
+device = "cuda" if torch.cuda.is_available() else "cpu"
+clip_model.to(device)
 
-if not GEMINI_API_KEY:
-    raise RuntimeError("GEMINI_API_KEY가 .env 파일에 설정되지 않았습니다.")
+# GPT 도슨트 설명 생성 함수
+def gpt_docent_ko(crop_description: str) -> str:
+    if not OPENAI_API_KEY:
+        raise RuntimeError("OPENAI_API_KEY가 설정되지 않았습니다.")
+    client = openai.OpenAI(api_key=OPENAI_API_KEY)
+    prompt = (
+        "당신은 미술관의 도슨트입니다. 아래 설명을 바탕으로 관람객에게 친절하게 설명해주세요. "
+        "너무 딱딱하거나 기술적이지 않게 풀어서 말해주세요.\n\n"
+        f"[작품 설명]: {crop_description}\n\n"
+        "→ 도슨트 스타일로 설명해주세요:"
+    )
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[{"role": "user", "content": prompt}]
+    )
+    return response.choices[0].message.content.strip()
 
-genai.configure(api_key=GEMINI_API_KEY)
-initialized_images: Set[str] = set()
-STRUCTURE_PATH = "data/met_structure_with_objects.json"
+# 메타데이터 로드
+def load_artworks():
+    with open("data/faiss/met_structured_with_objects.json", "r", encoding="utf-8") as f:
+        structured_data = json.load(f)
+    with open("data/faiss/met_text_meta.json", "r", encoding="utf-8") as f:
+        text_meta_data = json.load(f)
+    return structured_data, text_meta_data
 
-# 요청 DTO
-class ValidateRequest(BaseModel):
-    paintingId: int
+# 이미지 임베딩
+def embed_image(img: Image.Image):
+    inputs = clip_processor(images=img, return_tensors="pt").to(device)
+    with torch.no_grad():
+        emb = clip_model.get_image_features(**inputs)
+        emb = emb / emb.norm(dim=-1, keepdim=True)
+    return emb.cpu().numpy().astype("float32").squeeze()
 
-class AnalyzeClickRequest(BaseModel):
-    image_id: str
-    click_index: int = 0
+# 가장 유사한 작품 찾기
+def find_most_similar(uploaded_img: Image.Image, structured_data, text_meta_data):
+    uploaded_vec = embed_image(uploaded_img)
+    best_match = None
+    max_score = -float("inf")
 
-class DescriptionRequest(BaseModel):
-    crop_description: str
-
-def get_docent_description_from_text(crop_description: str) -> str:
-    try:
-        model = genai.GenerativeModel("models/gemini-2.0-flash")
-        prompt = (
-            "당신은 미술관의 도슨트입니다. 아래 설명을 바탕으로 관람객에게 친절하게 설명해주세요. "
-            "너무 딱딱하거나 기술적이지 않게 풀어서 말해주세요.\n\n"
-            f"[작품 설명]: {crop_description}\n\n"
-            "→ 도슨트 스타일로 설명해주세요:"
-        )
-        response = model.generate_content(prompt)
-        return response.text.strip()
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Gemini 도슨트 설명 생성 실패: {e}")
-
-@app.post("/validate/painting-id")
-def validate_painting_id(req: ValidateRequest):
-    try:
-        response = requests.post(
-            BACKEND_VALIDATION_URL,
-            json={"paintingId": req.paintingId},
-            headers={"Authorization": ACCESS_TOKEN}
-        )
-        if response.status_code != 200:
-            raise HTTPException(status_code=400, detail="Spring 서버에서 paintingId 유효하지 않음")
-        return {"status": "valid"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Spring 요청 실패: {e}")
-
-@app.post("/analyze/click")
-def analyze_click(req: AnalyzeClickRequest):
-    full_image_id = f"image_{req.image_id}"
-    image_path = f"data/met_images/{full_image_id}.jpg"
-    crop_id = f"{full_image_id}_crop{req.click_index}.jpg"
-    crop_path = f"data/cropped_images/{crop_id}"
-
-    if not os.path.exists(image_path):
-        raise HTTPException(status_code=404, detail=f"원본 이미지 없음: {image_path}")
-
-    if req.image_id not in initialized_images:
+    for art in structured_data:
+        art_img_path = art["image_path"]
         try:
-            subprocess.run(["python", "scripts/fetch_text_and_build_faiss.py"], check=True)
-            subprocess.run(["python", "scripts/click_and_find_faiss_seg.py", image_path], check=True)
-            subprocess.run(["python", "scripts/crop_and_sav_each_description.py", image_path], check=True)
-            initialized_images.add(req.image_id)
-        except subprocess.CalledProcessError as e:
-            raise HTTPException(status_code=500, detail=f"❌ 스크립트 실행 실패: {e}")
+            art_img = Image.open(art_img_path)
+            art_vec = embed_image(art_img)
+            score = float(np.dot(uploaded_vec, art_vec))
+            if score > max_score:
+                max_score = score
+                best_match = art
+        except Exception as e:
+            print(f"이미지 로드 실패: {art_img_path} - {e}")
 
-    if not os.path.exists(crop_path):
-        raise HTTPException(status_code=404, detail=f"Crop 이미지 없음: {crop_path}")
+    if not best_match:
+        return None
 
+    object_id = best_match["full_image_id"]
+    meta_info = next((item for item in text_meta_data if item["objectID"] == object_id), None)
+
+    result = {
+        "objectId": object_id,
+        "title": meta_info["title"] if meta_info else None,
+        "artist": meta_info["artist"] if meta_info else None,
+        "description": meta_info["summary"] if meta_info else None,
+        "imagePath": meta_info["image_path"] if meta_info else best_match["image_path"],
+        "exhibition": "The_Met"
+    }
+    return result
+
+# 백엔드: 이미지 업로드 API 호출
+def send_image_to_backend(image_file_path, exhibition, title):
+    with open(image_file_path, "rb") as img_file:
+        files = {"image": img_file}
+        data = {"exhibition": exhibition, "title": title}
+        res = requests.post(f"{BACKEND_URL}/upload", files=files, data=data)
+    res.raise_for_status()
+    return res.json()["result"]
+
+# 백엔드: 메타데이터 저장 API 호출
+def send_metadata_to_backend(image_url, artwork):
+    payload = {
+        "objectId": artwork["objectId"],
+        "title": artwork["title"],
+        "artist": artwork["artist"],
+        "description": artwork["description"],
+        "exhibition": artwork["exhibition"],
+        "imageUrl": image_url
+    }
+    print(f"[POST] {BACKEND_URL}/save\nPayload: {json.dumps(payload, ensure_ascii=False, indent=2)}")
+    res = requests.post(f"{BACKEND_URL}/save", json=payload)
+    res.raise_for_status()
+    return res.json()
+
+# FastAPI 엔드포인트
+@app.post("/process-image")
+async def process_uploaded_image(file: UploadFile):
     try:
-        with open(STRUCTURE_PATH, "r", encoding="utf-8") as f:
-            all_data = json.load(f)
+        # 업로드 이미지 저장
+        save_path = f"temp/{file.filename}"
+        with open(save_path, "wb") as f:
+            f.write(await file.read())
 
-        matched_description = "설명 없음"
-        for item in all_data:
-            if str(item["full_image_id"]) == req.image_id:
-                for crop in item.get("crops", []):
-                    if crop["crop_id"] == crop_id:
-                        matched_description = crop.get("crop_description", "설명 없음")
-                        break
-                break
+        # 유사 작품 찾기
+        structured_data, text_meta_data = load_artworks()
+        best_match = find_most_similar(Image.open(save_path).convert("RGB"), structured_data, text_meta_data)
+
+        if not best_match:
+            return JSONResponse(content={"error": "유사한 작품을 찾지 못했습니다."}, status_code=404)
+
+        exhibition = best_match["exhibition"]
+        title = best_match["title"]
+
+        # 이미지 S3에 업로드
+        image_url = send_image_to_backend(save_path, exhibition, title)
+
+        # GPT 설명 증강
+        if best_match["description"]:
+            docent_desc = gpt_docent_ko(best_match["description"])
+            best_match["description"] = docent_desc
+
+        # 메타데이터 백엔드로 전송
+        send_metadata_to_backend(image_url, best_match)
+
+        return JSONResponse(content={
+            "result": "success",
+            "objectId": best_match["objectId"],
+            "title": title,
+            "artist": best_match["artist"],
+            "description": best_match["description"],
+            "exhibition": exhibition,
+            "imageUrl": image_url
+        }, status_code=200)
+
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"설명 추출 실패: {e}")
-
-    # ⚠️ 안전하게 paintingId 변환
-    try:
-        painting_id = int(re.sub(r"\D", "", req.image_id))  # "435638"
-    except:
-        raise HTTPException(status_code=400, detail="image_id에서 paintingId 추출 실패")
-
-    result_payload = {
-        "paintingId": painting_id,
-        "cropId": crop_id,
-        "description": matched_description
-    }
-    headers = {
-        "Authorization": ACCESS_TOKEN,
-        "Content-Type": "application/json"
-    }
-    response = requests.post(BACKEND_RESPONSE_URL, json=result_payload, headers=headers)
-
-    if response.status_code != 200:
-        raise HTTPException(
-            status_code=response.status_code,
-            detail=f"Spring 전송 실패: {response.status_code} {response.text}"
-        )
-
-    return {
-        "status": "ok",
-        "crop_id": crop_id,
-        "description": matched_description,
-        "backend_response": response.json()
-    }
-
-# ✅ Gemini 설명 생성 테스트 엔드포인트 -- 테스트용이므로 잘 개발되면 이 코드 지워주세요
-@app.post("/test/gemini")
-def test_gemini(req: DescriptionRequest):
-    result = get_docent_description_from_text(req.crop_description)
-    return {"docent_description": result}
+        traceback.print_exc()
+        return JSONResponse(content={"error": str(e)}, status_code=500)
