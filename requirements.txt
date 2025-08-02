@@ -12,3 +12,6 @@ ultralytics
 langchain
 langchain-community
 requests
+
+# roboflow
+inference

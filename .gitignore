@@ -43,4 +43,10 @@ __pycache__/
 .idea/
 .env
 scripts/data/
+
+# Virtual environment
+venv/
+# Temporary files
 /temp/*
+# wik test img
+data/wiki_images/
