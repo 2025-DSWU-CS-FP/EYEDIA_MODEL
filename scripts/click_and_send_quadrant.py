@@ -45,6 +45,7 @@ def get_quadrant(x, y, w, h):
         return "Q4"  # bottom-right
 
 # crop 메타데이터 로드
+'''
 def load_crop_meta(path="data/faiss/met_structured_with_objects.json"):
     with open(path, "r", encoding="utf-8") as f:
         structured = json.load(f)
@@ -65,6 +66,24 @@ def load_crop_meta(path="data/faiss/met_structured_with_objects.json"):
                         "artist": item.get("full_image_artist", ""),
                     })
     return meta
+    '''
+def load_crop_meta(path="data/faiss/met_structured_with_objects.json"):
+    with open(path, "r", encoding="utf-8") as f:
+        structured = json.load(f)
+    meta = []
+    for item in structured:
+        for crop in item.get("crops", []):
+            if crop.get("crop_id") and crop.get("crop_description"):
+                meta.append({
+                    "crop_id": crop["crop_id"],
+                    "crop_description": crop["crop_description"],
+                    "quadrant": crop.get("quadrant"),
+                    "paintingId": item.get("full_image_id", ""),
+                    "title": item.get("full_image_title", ""),
+                    "artist": item.get("full_image_artist", ""),
+                })
+    return meta
+
 
 # 메인 실행 함수
 def detect_and_send_quadrant(image_path):
@@ -126,9 +145,15 @@ def detect_and_send_quadrant(image_path):
             quadrant = get_quadrant(cx, cy, w, h)
             print(f"✅ 클릭된 분면: {quadrant}")
 
+            '''
             selected_crops = [
                 crop for crop in crop_meta
                 if get_quadrant(crop["center_x"], crop["center_y"], w, h) == quadrant
+            ]
+            '''
+            selected_crops = [
+                crop for crop in crop_meta
+                if crop.get("quadrant") == quadrant
             ]
 
             if not selected_crops:
@@ -162,4 +187,4 @@ def detect_and_send_quadrant(image_path):
     cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    detect_and_send_quadrant("data/met_images/image_436244.jpg")
+    detect_and_send_quadrant("data/custom_images/toura_card_sharp.jpg")
