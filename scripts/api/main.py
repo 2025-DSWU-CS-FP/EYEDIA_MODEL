@@ -15,7 +15,6 @@ from fastapi.responses import JSONResponse
 # 환경 변수 로드
 load_dotenv()
 print("[✅] OPENAI_API_KEY =", os.getenv("OPENAI_API_KEY"))
-
 BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8080/api/v1/paintings")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 
