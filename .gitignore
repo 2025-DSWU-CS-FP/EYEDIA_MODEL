@@ -48,3 +48,5 @@ scripts/data/
 venv/
 # Temporary files
 /temp/*
+# wik test img
+data/wiki_images/
