@@ -141,6 +141,7 @@ def detect_and_search(image_path):
 
             # === 3️⃣ GPT 설명 ===
             docent_description = gpt_docent_ko(selected_crops, quadrant, rep_title)
+            print(rep_title)
             print(f"\n[GPT 설명 - {quadrant}]\n{docent_description}\n")
 
             # === 4️⃣ 백엔드 전송 ===
@@ -162,5 +163,5 @@ def detect_and_search(image_path):
     cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    detect_and_search("data/met_images/image_436885.jpg")
+    detect_and_search("data/met_images/toura_card_sharp.jpg")
 
