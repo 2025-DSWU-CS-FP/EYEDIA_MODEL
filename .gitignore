@@ -1,9 +1,11 @@
 ./logs/
 *.png
-data/cropped_images/
+
 *.pt
-<<<<<<< HEAD
-.jpg# 🔹 Python 관련
+
+*.jpg
+*.mp4
+🔹 Python 관련
 __pycache__/
 *.pyc
 *.pyo
@@ -16,9 +18,13 @@ models/
 !models/README.md  # 만약 모델 설명을 위한 문서가 있다면 예외 처리
 
 # 🔹 데이터
-#data/cropped_images/
-#data/met_images/
-#data/faiss/
+data/crops
+data/met_images/
+data/faiss/
+data/uploaed_videos/
+data/faiss/met_text.index
+data/faiss/met_text_meta.json
+data/faiss/met_structured_with_objects.json
 #*.index
 #*.json  # 만약 image_data.json이나 FAISS 관련 메타가 자주 변한다면
 
@@ -30,7 +36,6 @@ models/
 # 🔹 기타
 .env
 .DS_Store
-=======
 /cropped_images/
 __pycache__/
 *.py[cod]
@@ -38,4 +43,5 @@ __pycache__/
 .idea/
 .env
 scripts/data/
->>>>>>> develop
+/temp/*
+data/cropped_images/
