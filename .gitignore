@@ -28,10 +28,12 @@ data/faiss/met_structured_with_objects.json
 data/crops
 data/met_images/
 data/faiss/
-data/uploaed_videos/
 data/faiss/met_text.index
 data/faiss/met_text_meta.json
 data/faiss/met_structured_with_objects.json
+data/faiss/image_data.json
+data/faiss/image_data_meta.json
+
 #*.index
 #*.json  # 만약 image_data.json이나 FAISS 관련 메타가 자주 변한다면
 
