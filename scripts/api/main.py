@@ -15,7 +15,7 @@ from fastapi.responses import JSONResponse
 load_dotenv()
 print("[✅] OPENAI_API_KEY =", os.getenv("OPENAI_API_KEY"))
 
-BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8080/api/v1/paintings")
+BACKEND_URL = os.getenv("BACKEND_URL", "http://43.202.177.63:8080/api/v1/paintings")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 
 app = FastAPI()
@@ -120,7 +120,7 @@ def send_metadata_to_backend(image_url, artwork):
 # 백엔드: WebSocket Push용 엔드포인트 호출
 def push_painting_detected(payload):
     try:
-        res = requests.post(f"http://localhost:8080/paintings-push", json=payload)
+        res = requests.post(f"http://43.202.177.63:8080/paintings-push", json=payload)
         res.raise_for_status()
         print("[✅] WebSocket push 성공")
     except Exception as e:
