@@ -5,7 +5,6 @@ import numpy as np
 import torch
 from PIL import Image
 from transformers import CLIPProcessor, CLIPModel
-from pathlib import Path
 import requests
 import openai
 from dotenv import load_dotenv
@@ -14,7 +13,9 @@ from fastapi.responses import JSONResponse
 
 # 환경 변수 로드
 load_dotenv()
-BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8080/api/v1/paintings")
+print("[✅] OPENAI_API_KEY =", os.getenv("OPENAI_API_KEY"))
+
+BACKEND_URL = os.getenv("BACKEND_URL", "http://43.202.177.63:8080/api/v1/paintings")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 
 app = FastAPI()
@@ -114,14 +115,25 @@ def send_metadata_to_backend(image_url, artwork):
     print(f"[POST] {BACKEND_URL}/save\nPayload: {json.dumps(payload, ensure_ascii=False, indent=2)}")
     res = requests.post(f"{BACKEND_URL}/save", json=payload)
     res.raise_for_status()
-    return res.json()
+    return payload
+
+# 백엔드: WebSocket Push용 엔드포인트 호출
+def push_painting_detected(payload):
+    try:
+        res = requests.post(f"http://43.202.177.63:8080/paintings-push", json=payload)
+        res.raise_for_status()
+        print("[✅] WebSocket push 성공")
+    except Exception as e:
+        print(f"[WARN] WebSocket push 실패: {e}")
 
 # FastAPI 엔드포인트
 @app.post("/process-image")
 async def process_uploaded_image(file: UploadFile):
     try:
-        # 업로드 이미지 저장
+        os.makedirs("temp", exist_ok=True)
         save_path = f"temp/{file.filename}"
+
+        # 업로드 이미지 저장
         with open(save_path, "wb") as f:
             f.write(await file.read())
 
@@ -139,23 +151,18 @@ async def process_uploaded_image(file: UploadFile):
         image_url = send_image_to_backend(save_path, exhibition, title)
 
         # GPT 설명 증강
-        if best_match["description"]:
-            docent_desc = gpt_docent_ko(best_match["description"])
-            best_match["description"] = docent_desc
+        if best_match.get("description"):
+            best_match["description"] = gpt_docent_ko(best_match["description"])
 
-        # 메타데이터 백엔드로 전송
-        send_metadata_to_backend(image_url, best_match)
+        # 메타데이터 백엔드 저장
+        backend_payload = send_metadata_to_backend(image_url, best_match)
 
-        return JSONResponse(content={
-            "result": "success",
-            "objectId": best_match["objectId"],
-            "title": title,
-            "artist": best_match["artist"],
-            "description": best_match["description"],
-            "exhibition": exhibition,
-            "imageUrl": image_url
-        }, status_code=200)
+        # WebSocket Push
+        push_painting_detected({**backend_payload, "result": "success"})
+
+        # 최종 FastAPI 응답
+        return JSONResponse(content={**backend_payload, "result": "success"}, status_code=200)
 
     except Exception as e:
         traceback.print_exc()
-        return JSONResponse(content={"error": str(e)}, status_code=500)
+        return JSONResponse(content={"error": f"서버 오류: {e}"}, status_code=500)
