@@ -61,3 +61,5 @@ venv/
 /temp/*
 # wik test img
 data/wiki_images/
+
+v311/
