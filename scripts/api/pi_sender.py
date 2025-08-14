@@ -3,7 +3,7 @@ import requests
 import time
 from datetime import datetime
 
-INGEST_URL = "http://172.20.0.1:8008/api/v1/ingest"  
+INGEST_URL = "http://192.168.137.1:8008/api/v1/ingest"  
 FRONT_IDX = 2   # 전면 카메라 인덱스
 EYE_IDX   = 0   # 눈동자 카메라 인덱스
 WIDTH, HEIGHT, FPS = 640, 480, 15 # 해상도 및 FPS 설정
