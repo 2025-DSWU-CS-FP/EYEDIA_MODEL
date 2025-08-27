@@ -42,40 +42,6 @@ def embed_image(img: Image.Image):
         emb = emb / emb.norm(dim=-1, keepdim=True)
     return emb.cpu().numpy().astype("float32").squeeze()
 
-# 가장 유사한 작품 찾기
-def find_most_similar(uploaded_img: Image.Image, structured_data, text_meta_data):
-    uploaded_vec = embed_image(uploaded_img)
-    best_match = None
-    max_score = -float("inf")
-
-    for art in structured_data:
-        art_img_path = art["image_path"]
-        try:
-            art_img = Image.open(art_img_path)
-            art_vec = embed_image(art_img)
-            score = float(np.dot(uploaded_vec, art_vec))
-            if score > max_score:
-                max_score = score
-                best_match = art
-        except Exception as e:
-            print(f"이미지 로드 실패: {art_img_path} - {e}")
-
-    if not best_match:
-        return None
-
-    object_id = best_match["full_image_id"]
-    meta_info = next((item for item in text_meta_data if item["objectID"] == object_id), None)
-
-    result = {
-        "objectId": object_id,
-        "title": meta_info["title"] if meta_info else None,
-        "artist": meta_info["artist"] if meta_info else None,
-        "description": meta_info["summary"] if meta_info else None,
-        "imagePath": meta_info["image_path"] if meta_info else best_match["image_path"],
-        "exhibition": "The_Met"
-    }
-    return result
-
 # 백엔드: 이미지 업로드 API 호출
 def send_image_to_backend(image_file_path, exhibition, title):
     with open(image_file_path, "rb") as img_file:
