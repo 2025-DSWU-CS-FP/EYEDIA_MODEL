@@ -11,19 +11,19 @@ from dotenv import load_dotenv
 import requests
 import faiss
 
-# 환경변수 로드
+# ── ENV ────────────────────────────────────────────────────────────────
 load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 BACKEND_OBJECT_DESC_URL = os.getenv("BACKEND_OBJECT_DESC_URL", "http://localhost:8080/api/v1/ai/object-description")
 client = OpenAI(api_key=OPENAI_API_KEY)
 
-# === CLIP & FAISS 초기화 ===
+# ── CLIP & FAISS ──────────────────────────────────────────────────────
 device = "cuda" if torch.cuda.is_available() else "cpu"
 clip = CLIPModel.from_pretrained("openai/clip-vit-base-patch32").to(device)
 processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
 
 INDEX_PATH = "data/faiss/met_text.index"
-META_PATH = "data/faiss/met_text_meta.json"
+META_PATH  = "data/faiss/met_text_meta.json"  # ← 여기엔 objectID가 있어야 함
 STRUCTURED_PATH = "data/faiss/met_structured_with_objects.json"  # ← 새로 사용
 
 index = faiss.read_index(INDEX_PATH)
@@ -59,9 +59,9 @@ def _load_structured_by_id(path: str):
                 by_id[item["full_image_id"]] = item
     return by_id
 
-structured_by_id = _load_structured_by_id(STRUCTURED_PATH)  
+structured_by_id = _load_structured_by_id(STRUCTURED_PATH)
 
-# === 유틸 함수 ===
+# ── 유틸 ───────────────────────────────────────────────────────────────
 def embed_image(img: Image.Image) -> np.ndarray:
     inputs = processor(images=img, return_tensors="pt").to(device)
     with torch.no_grad():
@@ -86,31 +86,6 @@ def gpt_docent_ko(description_list, quadrant, painting_name):
     )
     return res.choices[0].message.content.strip()
 
-
-def call_docent(selected_crops, quadrant, painting_name, top_k=5):
-    # 점수/겹침 비율 순으로 정렬 후 상위만 사용 (원하면 기준 바꿔도 됨)
-    selected_crops = sorted(
-        selected_crops,
-        key=lambda x: (x.get("overlap_ratio_clicked", 0.0), x.get("score", 0.0)),
-        reverse=True
-    )
-
-    # crop_description만 뽑고 중복 제거
-    desc_list = []
-    seen = set()
-    for it in selected_crops:
-        d = (it.get("crop_description") or "").strip()
-        if not d:
-            continue
-        if d not in seen:
-            desc_list.append(d)
-            seen.add(d)
-        if len(desc_list) >= top_k:
-            break
-
-    # 기존 함수 그대로 호출
-    return gpt_docent_ko(desc_list, quadrant, painting_name)
-
 def get_quadrant(x, y, w, h):
     if x < w // 2 and y < h // 2:
         return "Q1"
@@ -121,7 +96,7 @@ def get_quadrant(x, y, w, h):
     else:
         return "Q4"
 
-# 0) 사분면 겹침 유틸 (한 픽셀이라도 겹치면 포함하려면 min_ratio=0.0, min_pixels=1)
+# 기존 YOLO-분면 유틸(필요시 유지)
 def _intersect_area(a, b):
     ax1, ay1, ax2, ay2 = a
     bx1, by1, bx2, by2 = b
@@ -130,7 +105,6 @@ def _intersect_area(a, b):
     return max(0, ix2 - ix1) * max(0, iy2 - iy1)
 
 def get_quadrants_for_bbox(x1, y1, x2, y2, w, h, min_ratio=0.05, min_pixels=1):
-    # 경계 보정
     x1 = max(0, min(x1, w)); x2 = max(0, min(x2, w))
     y1 = max(0, min(y1, h)); y2 = max(0, min(y2, h))
     if x2 <= x1 or y2 <= y1:
@@ -138,7 +112,6 @@ def get_quadrants_for_bbox(x1, y1, x2, y2, w, h, min_ratio=0.05, min_pixels=1):
 
     mx, my = w // 2, h // 2
     quads = {"Q1": (0,0,mx,my), "Q2": (mx,0,w,my), "Q3": (0,my,mx,h), "Q4": (mx,my,w,h)}
-
     box = (x1,y1,x2,y2)
     area = (x2-x1)*(y2-y1)
     ratios = {}
@@ -149,7 +122,6 @@ def get_quadrants_for_bbox(x1, y1, x2, y2, w, h, min_ratio=0.05, min_pixels=1):
         ratios[q] = r
         if ia >= min_pixels and r >= min_ratio:
             hit.append(q)
-    # 큰 비율 순 정렬
     hit.sort(key=lambda q: ratios[q], reverse=True)
     return hit, ratios
 
@@ -175,17 +147,13 @@ def get_crop_descriptions_from_structured(structured_rec: dict, quadrant: str, t
     cand.sort(key=lambda x: x[0], reverse=True)
     return [d for _, d in cand[:top_k]]
 
-
-# 검색 전에 한 번만 sanity check
+# ── FAISS/메타 sanity check ────────────────────────────────────────────
 ntotal = index.ntotal
 if ntotal == 0:
     print("[ERROR] FAISS index is empty (ntotal=0). 검색 불가.")
-
 if len(faiss_meta) != ntotal:
     print(f"[WARN] faiss_meta length ({len(faiss_meta)}) != index.ntotal ({ntotal}). 매핑 어긋남 가능.")
-    # 필요하면 여기서 return하거나 예외 처리
 
-# k 값은 ntotal을 넘지 않게
 K = min(3, ntotal)
 
 # ── 메타 → structured 매핑 함수 (이름 비교 금지) ─────────────────────────
@@ -213,6 +181,7 @@ def find_structured_record_for_rep(rep_meta: dict) -> dict | None:
         print(f"[WARN] structured_by_id에서 full_image_id={rep_id} 레코드를 찾지 못했습니다.")
     return rec
 
+# ── 메인 루프 ──────────────────────────────────────────────────────────
 def detect_and_search(image_path):
     if not os.path.exists(image_path):
         print(f"❗ 파일 없음: {image_path}")
@@ -223,20 +192,19 @@ def detect_and_search(image_path):
     image_rgb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
     image_pil = Image.fromarray(image_rgb)
 
-    # YOLO 객체 탐지
+    # YOLO 탐지(원하면 유지)
     yolo = YOLO("yolov8n-seg.pt")
     results = yolo(image_pil)[0]
-
     if results.boxes is None or len(results.boxes) == 0:
         print("❗ 객체가 감지되지 않음")
         return
 
-    # === 1️⃣ 대표 작품 결정 ===
+    # 1) 대표 작품 결정 (CLIP→FAISS)
     whole_emb = embed_image(image_pil).reshape(1, -1)
-    distances, indices = index.search(whole_emb, 1)  # top-1만 사용
-    rep_idx = indices[0][0]
-    rep_meta = faiss_meta[rep_idx]
-    rep_title = rep_meta.get("title", "Unknown Artwork")
+    distances, indices = index.search(whole_emb, 1)
+    rep_idx = int(indices[0][0])
+    rep_meta = faiss_meta[rep_idx] if 0 <= rep_idx < len(faiss_meta) else {}
+    rep_title  = rep_meta.get("title", "Unknown Artwork")
     rep_artist = rep_meta.get("artist", "Unknown Artist")
     print(f"🎨 대표 작품 결정: {rep_title} by {rep_artist}")
 
@@ -301,6 +269,4 @@ def detect_and_search(image_path):
     cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    detect_and_search("data/met_images/toura_card_sharp.jpg")
-
-
+    detect_and_search("data/met_images/monet_woman_parasol.jpg")
