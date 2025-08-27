@@ -14,17 +14,10 @@ from pathlib import Path as PPath
 
 load_dotenv()
 
-BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8080/api/v1")
-# BACKEND_URL = os.getenv("BACKEND_URL", "http://43.202.177.63:8080/api/v1")
+BACKEND_URL = os.getenv("BACKEND_URL", "http://43.202.177.63:8080/api/v1")
 S3_URL = os.getenv("S3_URL", "https://s3-eyedia.s3.ap-northeast-2.amazonaws.com")
 
 app = FastAPI()
-
-# CLIP 모델 초기화
-clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
-clip_processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
-device = "cuda" if torch.cuda.is_available() else "cpu"
-clip_model.to(device)
 
 # 메타데이터 로드 및 인덱싱
 @lru_cache(maxsize=1)
