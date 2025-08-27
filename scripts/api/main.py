@@ -17,7 +17,6 @@ print("[✅] OPENAI_API_KEY =", os.getenv("OPENAI_API_KEY"))
 
 BACKEND_URL = os.getenv("BACKEND_URL", "http://43.202.177.63:8080/api/v1/")
 S3_URL = os.getenv("S3_URL", "https://s3-eyedia.s3.ap-northeast-2.amazonaws.com/")
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 
 app = FastAPI()
 
@@ -26,23 +25,6 @@ clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
 clip_processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
 device = "cuda" if torch.cuda.is_available() else "cpu"
 clip_model.to(device)
-
-# GPT 도슨트 설명 생성 함수
-def gpt_docent_ko(crop_description: str) -> str:
-    if not OPENAI_API_KEY:
-        raise RuntimeError("OPENAI_API_KEY가 설정되지 않았습니다.")
-    client = openai.OpenAI(api_key=OPENAI_API_KEY)
-    prompt = (
-        "당신은 미술관의 도슨트입니다. 아래 설명을 바탕으로 관람객에게 친절하게 설명해주세요. "
-        "너무 딱딱하거나 기술적이지 않게 풀어서 말해주세요.\n\n"
-        f"[작품 설명]: {crop_description}\n\n"
-        "→ 도슨트 스타일로 설명해주세요:"
-    )
-    response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
-        messages=[{"role": "user", "content": prompt}]
-    )
-    return response.choices[0].message.content.strip()
 
 # 메타데이터 로드
 def load_artworks():
