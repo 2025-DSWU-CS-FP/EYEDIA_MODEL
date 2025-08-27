@@ -15,7 +15,8 @@ from fastapi.responses import JSONResponse
 load_dotenv()
 print("[✅] OPENAI_API_KEY =", os.getenv("OPENAI_API_KEY"))
 
-BACKEND_URL = os.getenv("BACKEND_URL", "http://43.202.177.63:8080/api/v1/paintings")
+BACKEND_URL = os.getenv("BACKEND_URL", "http://43.202.177.63:8080/api/v1/")
+S3_URL = os.getenv("S3_URL", "https://s3-eyedia.s3.ap-northeast-2.amazonaws.com/")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 
 app = FastAPI()
