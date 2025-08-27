@@ -6,14 +6,9 @@ import torch
 from PIL import Image
 from transformers import CLIPProcessor, CLIPModel
 import requests
-import openai
 from dotenv import load_dotenv
 from fastapi import FastAPI, UploadFile
 from fastapi.responses import JSONResponse
-
-# 환경 변수 로드
-load_dotenv()
-print("[✅] OPENAI_API_KEY =", os.getenv("OPENAI_API_KEY"))
 
 BACKEND_URL = os.getenv("BACKEND_URL", "http://43.202.177.63:8080/api/v1/")
 S3_URL = os.getenv("S3_URL", "https://s3-eyedia.s3.ap-northeast-2.amazonaws.com/")
@@ -33,14 +28,6 @@ def load_artworks():
     with open("data/faiss/met_text_meta.json", "r", encoding="utf-8") as f:
         text_meta_data = json.load(f)
     return structured_data, text_meta_data
-
-# 이미지 임베딩
-def embed_image(img: Image.Image):
-    inputs = clip_processor(images=img, return_tensors="pt").to(device)
-    with torch.no_grad():
-        emb = clip_model.get_image_features(**inputs)
-        emb = emb / emb.norm(dim=-1, keepdim=True)
-    return emb.cpu().numpy().astype("float32").squeeze()
 
 # 백엔드: 메타데이터 저장 API 호출
 def send_metadata_to_backend(image_url, artwork):
@@ -70,29 +57,6 @@ def push_painting_detected(payload):
 @app.post("/process-image")
 async def process_uploaded_image(file: UploadFile):
     try:
-        os.makedirs("temp", exist_ok=True)
-        save_path = f"temp/{file.filename}"
-
-        # 업로드 이미지 저장
-        with open(save_path, "wb") as f:
-            f.write(await file.read())
-
-        # 유사 작품 찾기
-        structured_data, text_meta_data = load_artworks()
-        best_match = find_most_similar(Image.open(save_path).convert("RGB"), structured_data, text_meta_data)
-
-        if not best_match:
-            return JSONResponse(content={"error": "유사한 작품을 찾지 못했습니다."}, status_code=404)
-
-        exhibition = best_match["exhibition"]
-        title = best_match["title"]
-
-        # 이미지 S3에 업로드
-        image_url = send_image_to_backend(save_path, exhibition, title)
-
-        # GPT 설명 증강
-        if best_match.get("description"):
-            best_match["description"] = gpt_docent_ko(best_match["description"])
 
         # 메타데이터 백엔드 저장
         backend_payload = send_metadata_to_backend(image_url, best_match)
