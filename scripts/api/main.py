@@ -42,15 +42,6 @@ def embed_image(img: Image.Image):
         emb = emb / emb.norm(dim=-1, keepdim=True)
     return emb.cpu().numpy().astype("float32").squeeze()
 
-# 백엔드: 이미지 업로드 API 호출
-def send_image_to_backend(image_file_path, exhibition, title):
-    with open(image_file_path, "rb") as img_file:
-        files = {"image": img_file}
-        data = {"exhibition": exhibition, "title": title}
-        res = requests.post(f"{BACKEND_URL}/upload", files=files, data=data)
-    res.raise_for_status()
-    return res.json()["result"]
-
 # 백엔드: 메타데이터 저장 API 호출
 def send_metadata_to_backend(image_url, artwork):
     payload = {
