@@ -2,13 +2,9 @@ from functools import lru_cache
 import os
 import json
 import traceback
-import numpy as np
-import torch
-from PIL import Image
-from transformers import CLIPProcessor, CLIPModel
 import requests
 from dotenv import load_dotenv
-from fastapi import FastAPI, Path, UploadFile
+from fastapi import FastAPI, Path
 from fastapi.responses import JSONResponse
 from pathlib import Path as PPath
 
