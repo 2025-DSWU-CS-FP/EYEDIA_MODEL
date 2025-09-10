@@ -2,19 +2,15 @@ from functools import lru_cache
 import os
 import json
 import traceback
-import numpy as np
-import torch
-from PIL import Image
-from transformers import CLIPProcessor, CLIPModel
 import requests
 from dotenv import load_dotenv
-from fastapi import FastAPI, Path, UploadFile
+from fastapi import FastAPI, Path
 from fastapi.responses import JSONResponse
 from pathlib import Path as PPath
 
 load_dotenv()
 
-BACKEND_URL = os.getenv("BACKEND_URL", "http://43.202.177.63:8080/api/v1")
+BACKEND_URL = os.getenv("BACKEND_URL", "http://43.202.177.63:8080")
 S3_URL = os.getenv("S3_URL", "https://s3-eyedia.s3.ap-northeast-2.amazonaws.com")
 
 app = FastAPI()
@@ -52,16 +48,16 @@ def send_metadata_to_backend(painting_id : int):
         "imageUrl": f"{S3_URL}/1/{painting_id}/{painting_id}"
     }
     
-    url = f"{BACKEND_URL}/paintings/save"
+    url = f"{BACKEND_URL}/api/v1/paintings/save"
     print(f"[POST] {url}\nPayload: {json.dumps(payload, ensure_ascii=False, indent=2)}")
     resp = requests.post(url, json=payload, timeout=10)
     resp.raise_for_status()
     return payload
 
 # 백엔드: WebSocket Push용 엔드포인트 호출
-def push_painting_detected(payload):
+def push_painting_detected(painting_id : int):
     try:
-        res = requests.post(f"http://43.202.177.63:8080/paintings-push", json=payload)
+        res = requests.post(f"{BACKEND_URL}/events/detect", json=painting_id)
         res.raise_for_status()
         print("[✅] WebSocket push 성공")
     except Exception as e:
@@ -75,7 +71,7 @@ async def process_uploaded_image(painting_id : int = Path(..., ge=1)):
         backend_payload = send_metadata_to_backend(painting_id)
 
         # WebSocket Push
-        push_painting_detected({**backend_payload, "result": "success"})
+        push_painting_detected(painting_id)
 
         # 최종 FastAPI 응답
         return JSONResponse(content={**backend_payload, "result": "success"}, status_code=200)
