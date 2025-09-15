@@ -57,7 +57,7 @@ def send_metadata_to_backend(painting_id : int):
 # 백엔드: WebSocket Push용 엔드포인트 호출
 def push_painting_detected(painting_id : int):
     try:
-        res = requests.post(f"{BACKEND_URL}/events/detect", json=painting_id)
+        res = requests.post(f"{BACKEND_URL}/api/v1/events/detect", json=painting_id)
         res.raise_for_status()
         print("[✅] WebSocket push 성공")
     except Exception as e:
