@@ -184,4 +184,4 @@ def detect_and_send_crop(image_path):
     return
 
 if __name__ == "__main__":
-    detect_and_send_crop("data/met_images/image_436238.jpg")
+    detect_and_send_crop("data/met_images/image_436244.jpg")
