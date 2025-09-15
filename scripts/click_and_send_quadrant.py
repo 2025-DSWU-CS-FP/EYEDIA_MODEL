@@ -301,6 +301,6 @@ def detect_and_search(image_path):
     cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    detect_and_search("data/met_images/toura_card_sharp.jpg")
+    detect_and_search("data/met_images/image_20001.jpg")
 
 

@@ -164,12 +164,12 @@ def find_structured_record_for_rep(rep_meta: dict) -> dict | None:
     """
     # 선호: objectID → full_image_id
     rep_id = None
-    for key in ("objectID", "objectId", "id", "full_image_id"):
+    for key in ("objectID", "full_image_id"):
         if key in rep_meta:
             rep_id = rep_meta[key]
             break
     if rep_id is None:
-        print("[WARN] rep_meta에 objectID/id/full_image_id가 없습니다. (이름 매칭은 사용하지 않도록 요청받음)")
+        print("[WARN] rep_meta에 objectID/full_image_id가 없습니다. (이름 매칭은 사용하지 않도록 요청받음)")
         return None
     # int/str 혼용 대비
     try:
@@ -269,4 +269,4 @@ def detect_and_search(image_path):
     cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    detect_and_search("data/met_images/monet_woman_parasol.jpg")
+    detect_and_search("data/met_images/image_20003.jpg")

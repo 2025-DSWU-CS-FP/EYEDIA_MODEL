@@ -19,25 +19,25 @@ custom_images = [
         "date": "1874",
         "medium": "Oil on Canvas",
         "culture": "French",
-        "image_path": "data/met_images/degas_dance_class.jpg"
+        "image_path": "data/met_images/image_20001.jpg"
     },
     {
         "objectID": 200002,
-        "title": "The Card Sharp with the Ace of Diamonds (다이아몬드 에이스를 가진 사기꾼)",
-        "artist": "Georges de La Tour",
-        "date": "1630",
-        "medium": "Oil on Canvas",
-        "culture": "French",
-        "image_path": "data/met_images/toura_card_sharp.jpg"
-    },
-    {
-        "objectID": 200003,
         "title": "Woman with a Parasol (양산을 쓴 여인)",
         "artist": "Claude Monet",
         "date": "1875",
         "medium": "Oil on Canvas",
         "culture": "French",
-        "image_path": "data/met_images/monet_woman_parasol.jpg"
+        "image_path": "data/met_images/image_20002.jpg"
+    },
+    {
+        "objectID": 200003,
+        "title": "The Card Sharp with the Ace of Diamonds (다이아몬드 에이스를 가진 사기꾼)",
+        "artist": "Georges de La Tour",
+        "date": "1630",
+        "medium": "Oil on Canvas",
+        "culture": "French",
+        "image_path": "data/met_images/image_20003.jpg"
     }
 ]
 
