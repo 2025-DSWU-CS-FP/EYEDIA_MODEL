@@ -63,3 +63,8 @@ venv/
 data/wiki_images/
 
 v311/
+
+# faiss
+/data/faiss/met_structured_with_objects
+/data/faiss/met_text.index
+/data/faiss/met_text_meta
