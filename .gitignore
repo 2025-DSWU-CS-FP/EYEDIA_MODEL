@@ -1,6 +1,6 @@
 ./logs/
 *.png
-
+data/cropped_images/
 *.pt
 
 *.jpg
@@ -25,6 +25,15 @@ data/uploaed_videos/
 data/faiss/met_text.index
 data/faiss/met_text_meta.json
 data/faiss/met_structured_with_objects.json
+data/crops
+data/met_images/
+data/faiss/
+data/faiss/met_text.index
+data/faiss/met_text_meta.json
+data/faiss/met_structured_with_objects.json
+data/faiss/image_data.json
+data/faiss/image_data_meta.json
+
 #*.index
 #*.json  # 만약 image_data.json이나 FAISS 관련 메타가 자주 변한다면
 
@@ -44,3 +53,11 @@ __pycache__/
 .env
 scripts/data/
 /temp/*
+data/cropped_images/
+
+# Virtual environment
+venv/
+# Temporary files
+/temp/*
+# wik test img
+data/wiki_images/

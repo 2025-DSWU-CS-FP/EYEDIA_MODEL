@@ -1,0 +1,301 @@
+[
+  {
+    "full_image_id": 436418,
+    "full_image_description": "Jerusalem from the Mount of Olives. Charles-Théodore Frère. by 1880. Oil on canvas.",
+    "image_path": "data/met_images/image_436418.jpg",
+    "crops": [
+      {
+        "crop_id": "436418_crop0",
+        "crop_path": "./data/crops/436418_crop0.jpg",
+        "crop_description": "A Hare and Birds. Jan Fyt. . Oil on canvas.",
+        "quadrant": "Q3"
+      },
+      {
+        "crop_id": "436418_crop1",
+        "crop_path": "./data/crops/436418_crop1.jpg",
+        "crop_description": "Maria Louisa (1745–1792), Holy Roman Empress, German Queen, Queen of Hungary and Bohemia, and Grand Duchess of Tuscany. Heinrich Friedrich Füger. ca. 1790. Ivory.",
+        "quadrant": "Q3"
+      },
+      {
+        "crop_id": "436418_crop2",
+        "crop_path": "./data/crops/436418_crop2.jpg",
+        "crop_description": "The Nativity. Bernardino Fungai. probably after 1500. Oil and gold on wood.",
+        "quadrant": "Q3"
+      }
+    ]
+  },
+  {
+    "full_image_id": 436419,
+    "full_image_description": "The Arab Falconer. Eugène Fromentin. 1864. Oil on canvas.",
+    "image_path": "data/met_images/image_436419.jpg",
+    "crops": [
+      {
+        "crop_id": "436419_crop0",
+        "crop_path": "./data/crops/436419_crop0.jpg",
+        "crop_description": "The Arab Falconer. Eugène Fromentin. 1864. Oil on canvas.",
+        "quadrant": "Q4"
+      },
+      {
+        "crop_id": "436419_crop1",
+        "crop_path": "./data/crops/436419_crop1.jpg",
+        "crop_description": "The Arab Falconer. Eugène Fromentin. 1864. Oil on canvas.",
+        "quadrant": "Q2"
+      }
+    ]
+  },
+  {
+    "full_image_id": 436420,
+    "full_image_description": "Arabs Crossing a Ford. Eugène Fromentin. 1873. Oil on wood.",
+    "image_path": "data/met_images/image_436420.jpg",
+    "crops": [
+      {
+        "crop_id": "436420_crop0",
+        "crop_path": "./data/crops/436420_crop0.jpg",
+        "crop_description": "Arabs Crossing a Ford. Eugène Fromentin. 1873. Oil on wood.",
+        "quadrant": "Q3"
+      },
+      {
+        "crop_id": "436420_crop1",
+        "crop_path": "./data/crops/436420_crop1.jpg",
+        "crop_description": "A Hare, Partridges, and Fruit. Jan Fyt. . Oil on canvas.",
+        "quadrant": "Q4"
+      },
+      {
+        "crop_id": "436420_crop2",
+        "crop_path": "./data/crops/436420_crop2.jpg",
+        "crop_description": "A Partridge and Small Game Birds. Jan Fyt. 1650s. Oil on canvas.",
+        "quadrant": "Q3"
+      },
+      {
+        "crop_id": "436420_crop3",
+        "crop_path": "./data/crops/436420_crop3.jpg",
+        "crop_description": "A Hare, Partridges, and Fruit. Jan Fyt. . Oil on canvas.",
+        "quadrant": "Q3"
+      },
+      {
+        "crop_id": "436420_crop4",
+        "crop_path": "./data/crops/436420_crop4.jpg",
+        "crop_description": "A Hare, Partridges, and Fruit. Jan Fyt. . Oil on canvas.",
+        "quadrant": "Q3"
+      },
+      {
+        "crop_id": "436420_crop5",
+        "crop_path": "./data/crops/436420_crop5.jpg",
+        "crop_description": "The Nativity. Bernardino Fungai. probably after 1500. Oil and gold on wood.",
+        "quadrant": "Q4"
+      },
+      {
+        "crop_id": "436420_crop6",
+        "crop_path": "./data/crops/436420_crop6.jpg",
+        "crop_description": "A Partridge and Small Game Birds. Jan Fyt. 1650s. Oil on canvas.",
+        "quadrant": "Q4"
+      },
+      {
+        "crop_id": "436420_crop7",
+        "crop_path": "./data/crops/436420_crop7.jpg",
+        "crop_description": "The Nativity. Bernardino Fungai. probably after 1500. Oil and gold on wood.",
+        "quadrant": "Q4"
+      }
+    ]
+  },
+  {
+    "full_image_id": 436421,
+    "full_image_description": "Maria Louisa (1745–1792), Holy Roman Empress, German Queen, Queen of Hungary and Bohemia, and Grand Duchess of Tuscany. Heinrich Friedrich Füger. ca. 1790. Ivory.",
+    "image_path": "data/met_images/image_436421.jpg",
+    "crops": [
+      {
+        "crop_id": "436421_crop0",
+        "crop_path": "./data/crops/436421_crop0.jpg",
+        "crop_description": "Maria Louisa (1745–1792), Holy Roman Empress, German Queen, Queen of Hungary and Bohemia, and Grand Duchess of Tuscany. Heinrich Friedrich Füger. ca. 1790. Ivory.",
+        "quadrant": "Q3"
+      }
+    ]
+  },
+  {
+    "full_image_id": 436422,
+    "full_image_description": "The Nativity. Bernardino Fungai. probably after 1500. Oil and gold on wood.",
+    "image_path": "data/met_images/image_436422.jpg",
+    "crops": [
+      {
+        "crop_id": "436422_crop0",
+        "crop_path": "./data/crops/436422_crop0.jpg",
+        "crop_description": "Maria Louisa (1745–1792), Holy Roman Empress, German Queen, Queen of Hungary and Bohemia, and Grand Duchess of Tuscany. Heinrich Friedrich Füger. ca. 1790. Ivory.",
+        "quadrant": "Q4"
+      },
+      {
+        "crop_id": "436422_crop1",
+        "crop_path": "./data/crops/436422_crop1.jpg",
+        "crop_description": "The Nativity. Bernardino Fungai. probably after 1500. Oil and gold on wood.",
+        "quadrant": "Q3"
+      }
+    ]
+  },
+  {
+    "full_image_id": 436423,
+    "full_image_description": "The Night-Hag Visiting Lapland Witches. Henry Fuseli. 1796. Oil on canvas.",
+    "image_path": "data/met_images/image_436423.jpg",
+    "crops": []
+  },
+  {
+    "full_image_id": 436424,
+    "full_image_description": "A Basket and Birds. Jan Fyt. . Oil on canvas.",
+    "image_path": "data/met_images/image_436424.jpg",
+    "crops": [
+      {
+        "crop_id": "436424_crop0",
+        "crop_path": "./data/crops/436424_crop0.jpg",
+        "crop_description": "A Partridge and Small Game Birds. Jan Fyt. 1650s. Oil on canvas.",
+        "quadrant": "Q4"
+      }
+    ]
+  },
+  {
+    "full_image_id": 436425,
+    "full_image_description": "A Hare and Birds. Jan Fyt. . Oil on canvas.",
+    "image_path": "data/met_images/image_436425.jpg",
+    "crops": [
+      {
+        "crop_id": "436425_crop0",
+        "crop_path": "./data/crops/436425_crop0.jpg",
+        "crop_description": "A Hare, Partridges, and Fruit. Jan Fyt. . Oil on canvas.",
+        "quadrant": "Q3"
+      },
+      {
+        "crop_id": "436425_crop1",
+        "crop_path": "./data/crops/436425_crop1.jpg",
+        "crop_description": "A Hare, Partridges, and Fruit. Jan Fyt. . Oil on canvas.",
+        "quadrant": "Q4"
+      }
+    ]
+  },
+  {
+    "full_image_id": 436426,
+    "full_image_description": "A Hare, Partridges, and Fruit. Jan Fyt. . Oil on canvas.",
+    "image_path": "data/met_images/image_436426.jpg",
+    "crops": [
+      {
+        "crop_id": "436426_crop0",
+        "crop_path": "./data/crops/436426_crop0.jpg",
+        "crop_description": "Maria Louisa (1745–1792), Holy Roman Empress, German Queen, Queen of Hungary and Bohemia, and Grand Duchess of Tuscany. Heinrich Friedrich Füger. ca. 1790. Ivory.",
+        "quadrant": "Q2"
+      }
+    ]
+  },
+  {
+    "full_image_id": 436427,
+    "full_image_description": "A Partridge and Small Game Birds. Jan Fyt. 1650s. Oil on canvas.",
+    "image_path": "data/met_images/image_436427.jpg",
+    "crops": []
+  },
+  {
+    "full_image_id": 200001,
+    "full_image_description": "The Dance Class (무용수업). Edgar Degas. 1874. Oil on Canvas. French",
+    "image_path": "data/met_images/degas_dance_class.jpg",
+    "crops": [
+      {
+        "crop_id": "200001_crop0",
+        "crop_path": "./data/crops/200001_crop0.jpg",
+        "crop_description": "Woman with a Parasol (양산을 쓴 여인). Claude Monet. 1875. Oil on Canvas. French",
+        "quadrant": "Q4"
+      },
+      {
+        "crop_id": "200001_crop1",
+        "crop_path": "./data/crops/200001_crop1.jpg",
+        "crop_description": "The Dance Class (무용수업). Edgar Degas. 1874. Oil on Canvas. French",
+        "quadrant": "Q1"
+      },
+      {
+        "crop_id": "200001_crop2",
+        "crop_path": "./data/crops/200001_crop2.jpg",
+        "crop_description": "Woman with a Parasol (양산을 쓴 여인). Claude Monet. 1875. Oil on Canvas. French",
+        "quadrant": "Q3"
+      },
+      {
+        "crop_id": "200001_crop3",
+        "crop_path": "./data/crops/200001_crop3.jpg",
+        "crop_description": "The Dance Class (무용수업). Edgar Degas. 1874. Oil on Canvas. French",
+        "quadrant": "Q2"
+      },
+      {
+        "crop_id": "200001_crop4",
+        "crop_path": "./data/crops/200001_crop4.jpg",
+        "crop_description": "The Dance Class (무용수업). Edgar Degas. 1874. Oil on Canvas. French",
+        "quadrant": "Q2"
+      },
+      {
+        "crop_id": "200001_crop5",
+        "crop_path": "./data/crops/200001_crop5.jpg",
+        "crop_description": "The Dance Class (무용수업). Edgar Degas. 1874. Oil on Canvas. French",
+        "quadrant": "Q2"
+      },
+      {
+        "crop_id": "200001_crop6",
+        "crop_path": "./data/crops/200001_crop6.jpg",
+        "crop_description": "The Dance Class (무용수업). Edgar Degas. 1874. Oil on Canvas. French",
+        "quadrant": "Q2"
+      },
+      {
+        "crop_id": "200001_crop7",
+        "crop_path": "./data/crops/200001_crop7.jpg",
+        "crop_description": "The Dance Class (무용수업). Edgar Degas. 1874. Oil on Canvas. French",
+        "quadrant": "Q2"
+      }
+    ]
+  },
+  {
+    "full_image_id": 200002,
+    "full_image_description": "The Card Sharp with the Ace of Diamonds (다이아몬드 에이스를 가진 사기꾼). Georges de La Tour. 1630. Oil on Canvas. French",
+    "image_path": "data/met_images/toura_card_sharp.jpg",
+    "crops": [
+      {
+        "crop_id": "200002_crop0",
+        "crop_path": "./data/crops/200002_crop0.jpg",
+        "crop_description": "The Arab Falconer. Eugène Fromentin. 1864. Oil on canvas.",
+        "quadrant": "Q4"
+      },
+      {
+        "crop_id": "200002_crop1",
+        "crop_path": "./data/crops/200002_crop1.jpg",
+        "crop_description": "The Card Sharp with the Ace of Diamonds (다이아몬드 에이스를 가진 사기꾼). Georges de La Tour. 1630. Oil on Canvas. French",
+        "quadrant": "Q2"
+      },
+      {
+        "crop_id": "200002_crop2",
+        "crop_path": "./data/crops/200002_crop2.jpg",
+        "crop_description": "The Card Sharp with the Ace of Diamonds (다이아몬드 에이스를 가진 사기꾼). Georges de La Tour. 1630. Oil on Canvas. French",
+        "quadrant": "Q1"
+      },
+      {
+        "crop_id": "200002_crop3",
+        "crop_path": "./data/crops/200002_crop3.jpg",
+        "crop_description": "The Card Sharp with the Ace of Diamonds (다이아몬드 에이스를 가진 사기꾼). Georges de La Tour. 1630. Oil on Canvas. French",
+        "quadrant": "Q1"
+      },
+      {
+        "crop_id": "200002_crop4",
+        "crop_path": "./data/crops/200002_crop4.jpg",
+        "crop_description": "The Card Sharp with the Ace of Diamonds (다이아몬드 에이스를 가진 사기꾼). Georges de La Tour. 1630. Oil on Canvas. French",
+        "quadrant": "Q1"
+      }
+    ]
+  },
+  {
+    "full_image_id": 200003,
+    "full_image_description": "Woman with a Parasol (양산을 쓴 여인). Claude Monet. 1875. Oil on Canvas. French",
+    "image_path": "data/met_images/monet_woman_parasol.jpg",
+    "crops": [
+      {
+        "crop_id": "200003_crop0",
+        "crop_path": "./data/crops/200003_crop0.jpg",
+        "crop_description": "Woman with a Parasol (양산을 쓴 여인). Claude Monet. 1875. Oil on Canvas. French",
+        "quadrant": "Q2"
+      },
+      {
+        "crop_id": "200003_crop1",
+        "crop_path": "./data/crops/200003_crop1.jpg",
+        "crop_description": "Woman with a Parasol (양산을 쓴 여인). Claude Monet. 1875. Oil on Canvas. French",
+        "quadrant": "Q3"
+      }
+    ]
+  }
+]
