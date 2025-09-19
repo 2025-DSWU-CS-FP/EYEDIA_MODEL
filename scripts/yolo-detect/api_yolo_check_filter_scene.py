@@ -32,6 +32,7 @@ ART_CLASSES = ["tv", "book", "laptop", "cell phone", "remote", "keyboard", "moni
 latest_painting_id = None
 latest_coords = None
 command_executed = False
+selected_q = "Q1" # 사용자가 선택한 영역
 
 def embed_crop(image: np.ndarray):
     pil_image = Image.fromarray(image)
@@ -91,26 +92,26 @@ while True:
         break  # 하나만 감지되면 바로 중단
 
     cv2.imshow("🎨 Art-Like Detection + FAISS", frame)
-
+# /process-image?art_id=200001&q=Q1
     if found:
         if mode == "art":
             if latest_painting_id:
                 print(f"🖼️ 감지된 그림 ID: {latest_painting_id}")
-                url = f"http://3.34.240.201:8000/process-image/{latest_painting_id}"
-                res = requests.post(url)  
-                print(f"그림 인식 전송 완료: {res.status_code}")
+                url = f"http://3.34.240.201:8000/process-image?art_id={latest_painting_id}"
+                res = requests.get(url)
+                print(f"🎯 그림 인식 전송 완료: {res.status_code}")
+                print(f"모델로 push by /detect-art : {url}")
                 command_executed = True
                 break
 
 
         elif mode == "area":
-            if latest_painting_id:
-                payload = {
-                    "q1": [100, 200]  # 🔧 하드코딩된 좌표값
-                }
-                url = f"http://3.34.240.201:8000/process-image/{latest_painting_id}"
-                res = requests.post(url, json=payload)
-                print(f"🗺️ Q1 하드코딩 영역 전송 완료: {payload}, {res.status_code}")
+            if latest_painting_id and selected_q:
+                url = f"http://3.34.240.201:8000/process-image?art_id={latest_painting_id}&q={selected_q}"
+                res = requests.get(url)
+                # Todo: 응시 영역 호출 함수 추가
+                print(f"🗺️ {selected_q} 영역 전송 완료: {res.status_code}")
+                print(f"모델로 push by /detect-area : {url}")
                 command_executed = True
                 break
 
