@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, Path
 from fastapi.responses import JSONResponse
 from pathlib import Path as PPath
+from fastapi import Query
 
 load_dotenv()
 
