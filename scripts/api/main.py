@@ -84,7 +84,7 @@ def push_painting_area_detected(painting_id: int, q: str = None):
         print(f"[WARN] WebSocket push 실패: {e}")
 
 # FastAPI 엔드포인트
-@app.post("/process-image/{painting_id}")
+@app.post("/process-image")
 async def process_uploaded_image(
     painting_id: int = Query(..., alias="art_id"),
     q: str | None = Query(None, alias="q")
@@ -95,10 +95,10 @@ async def process_uploaded_image(
 
         # WebSocket Push
         if(q):
-            push_painting_area_detected(painting_id) # q1받아오도록 수정. 정해진 api 있음
+            push_painting_area_detected(painting_id, q) # q1받아오도록 수정. 정해진 api 있음
 
         else:
-            push_painting_detected(painting_id, q) # q1받아오도록 수정. 정해진 api 있음
+            push_painting_detected(painting_id) # q1받아오도록 수정. 정해진 api 있음
 
         # 최종 FastAPI 응답
         return JSONResponse(content={**backend_payload, "result": "success"}, status_code=200)
