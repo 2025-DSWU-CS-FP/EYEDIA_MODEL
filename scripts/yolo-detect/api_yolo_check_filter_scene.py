@@ -93,11 +93,13 @@ while True:
 
     cv2.imshow("🎨 Art-Like Detection + FAISS", frame)
 # /process-image?art_id=200001&q=Q1
+# ======= 25.09.20 api 수정 by kcw9609 ===============
+    print("수정본")
     if found:
         if mode == "art":
             if latest_painting_id:
                 print(f"🖼️ 감지된 그림 ID: {latest_painting_id}")
-                url = f"http://3.34.240.201:8000/process-image?painting_id={latest_painting_id}"
+                url = f"http://3.34.240.201:8000/process-image?art_id={latest_painting_id}"
                 res = requests.post(url)
                 print(f"🎯 그림 인식 전송 완료: {res.status_code}")
                 print(f"모델로 push by /detect-art : {url}")
@@ -117,7 +119,7 @@ while True:
 
             if cv2.waitKey(1) & 0xFF == ord("q"):
                 break
-
+# =============================================
 # ✅ 종료 처리
 cap.release()
 cv2.destroyAllWindows()
