@@ -97,8 +97,8 @@ while True:
         if mode == "art":
             if latest_painting_id:
                 print(f"🖼️ 감지된 그림 ID: {latest_painting_id}")
-                url = f"http://3.34.240.201:8000/process-image?art_id={latest_painting_id}"
-                res = requests.get(url)
+                url = f"http://3.34.240.201:8000/process-image?painting_id={latest_painting_id}"
+                res = requests.post(url)
                 print(f"🎯 그림 인식 전송 완료: {res.status_code}")
                 print(f"모델로 push by /detect-art : {url}")
                 command_executed = True
@@ -108,7 +108,7 @@ while True:
         elif mode == "area":
             if latest_painting_id and selected_q:
                 url = f"http://3.34.240.201:8000/process-image?art_id={latest_painting_id}&q={selected_q}"
-                res = requests.get(url)
+                res = requests.post(url)
                 # Todo: 응시 영역 호출 함수 추가
                 print(f"🗺️ {selected_q} 영역 전송 완료: {res.status_code}")
                 print(f"모델로 push by /detect-area : {url}")
