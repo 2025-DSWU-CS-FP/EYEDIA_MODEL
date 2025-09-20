@@ -1,0 +1,7 @@
+# OpenCV, Dlib, Scikit-learn, joblib 설치
+pip install opencv-python dlib scikit-learn joblib numpy
+
+# Dlib 얼굴 특징점 모델 다운로드
+# 아래 링크에서 shape_predictor_68_face_landmarks.dat.bz2 파일을 다운로드 받고 압축을 해제하여
+# 파이썬 코드와 같은 폴더에 저장해주세요.
+# 링크: http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2
