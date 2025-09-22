@@ -43,7 +43,7 @@ def send_metadata_to_backend(painting_id : int):
         raise ValueError(f"[send_metadata_to_backend] met_text_meta.json에서 ID {painting_id}를 찾을 수 없습니다.")
 
     payload = {
-        "objectId": int(item.get("objectID") or item.get("id")),   # 백엔드가 camelCase(objectId) 기대한다고 가정
+        "artId": int(item.get("artId") or item.get("id")),   # 백엔드가 camelCase(objectId) 기대한다고 가정
         "title": item.get("title"),
         "artist": item.get("artist"),
         "description": item.get("summary"),
