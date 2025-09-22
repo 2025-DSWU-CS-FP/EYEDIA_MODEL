@@ -1,0 +1,844 @@
+[
+  {
+    "full_image_id": 436499,
+    "full_image_description": "Diana the Huntress. Giampietrino (Giovanni Pietro Rizzoli). . Oil on wood.",
+    "image_path": "data/met_images/image_436499.jpg",
+    "crops": [
+      {
+        "crop_id": "436499_crop0",
+        "crop_path": "./data/crops/436499_crop0.jpg",
+        "crop_description": "Diana the Huntress. Giampietrino (Giovanni Pietro Rizzoli). . Oil on wood.",
+        "primary_quadrant": "Q2",
+        "quadrants": [
+          "Q2",
+          "Q4",
+          "Q1",
+          "Q3"
+        ],
+        "quadrant_ratios": {
+          "Q1": 0.22890774028476749,
+          "Q2": 0.28422711085358626,
+          "Q3": 0.21718891399032544,
+          "Q4": 0.26967623487132075
+        }
+      }
+    ]
+  },
+  {
+    "full_image_id": 436500,
+    "full_image_description": "Portrait of a Man, Said to Be John Cecil (1628–1678), Fourth Earl of Exeter. Richard Gibson. ca. 1670. Vellum laid on card.",
+    "image_path": "data/met_images/image_436500.jpg",
+    "crops": [
+      {
+        "crop_id": "436500_crop0",
+        "crop_path": "./data/crops/436500_crop0.jpg",
+        "crop_description": "Portrait of a Man, Said to Be John Cecil (1628–1678), Fourth Earl of Exeter. Richard Gibson. ca. 1670. Vellum laid on card.",
+        "primary_quadrant": "Q3",
+        "quadrants": [
+          "Q3",
+          "Q1",
+          "Q4",
+          "Q2"
+        ],
+        "quadrant_ratios": {
+          "Q1": 0.2598370492010358,
+          "Q2": 0.2190361902355839,
+          "Q3": 0.2827638476599507,
+          "Q4": 0.23836291290342954
+        }
+      }
+    ]
+  },
+  {
+    "full_image_id": 436501,
+    "full_image_description": "Francesca Ghirardi Lechi (1773–1806). Giovanni Battista Gigola. . Ivory.",
+    "image_path": "data/met_images/image_436501.jpg",
+    "crops": [
+      {
+        "crop_id": "436501_crop0",
+        "crop_path": "./data/crops/436501_crop0.jpg",
+        "crop_description": "Francesca Ghirardi Lechi (1773–1806). Giovanni Battista Gigola. . Ivory.",
+        "primary_quadrant": "Q3",
+        "quadrants": [
+          "Q3",
+          "Q4",
+          "Q1",
+          "Q2"
+        ],
+        "quadrant_ratios": {
+          "Q1": 0.2054407744364272,
+          "Q2": 0.1936091067987272,
+          "Q3": 0.3093840234072386,
+          "Q4": 0.291566095357607
+        }
+      }
+    ]
+  },
+  {
+    "full_image_id": 436502,
+    "full_image_description": "The Annunciation. Luca Giordano. 1672. Oil on canvas.",
+    "image_path": "data/met_images/image_436502.jpg",
+    "crops": [
+      {
+        "crop_id": "436502_crop0",
+        "crop_path": "./data/crops/436502_crop0.jpg",
+        "crop_description": "Diana the Huntress. Giampietrino (Giovanni Pietro Rizzoli). . Oil on wood.",
+        "primary_quadrant": "Q1",
+        "quadrants": [
+          "Q1",
+          "Q3"
+        ],
+        "quadrant_ratios": {
+          "Q1": 0.6879738367771666,
+          "Q2": 0.029768098706704327,
+          "Q3": 0.27055150884495316,
+          "Q4": 0.011706555671175858
+        }
+      },
+      {
+        "crop_id": "436502_crop1",
+        "crop_path": "./data/crops/436502_crop1.jpg",
+        "crop_description": "The Annunciation. Luca Giordano. 1672. Oil on canvas.",
+        "primary_quadrant": "Q4",
+        "quadrants": [
+          "Q4",
+          "Q3",
+          "Q2",
+          "Q1"
+        ],
+        "quadrant_ratios": {
+          "Q1": 0.056332138590203105,
+          "Q2": 0.1640979689366786,
+          "Q3": 0.19922341696535245,
+          "Q4": 0.5803464755077659
+        }
+      }
+    ]
+  },
+  {
+    "full_image_id": 436503,
+    "full_image_description": "The Flight into Egypt. Luca Giordano. 1701. Oil on canvas.",
+    "image_path": "data/met_images/image_436503.jpg",
+    "crops": [
+      {
+        "crop_id": "436503_crop0",
+        "crop_path": "./data/crops/436503_crop0.jpg",
+        "crop_description": "The Flight into Egypt. Luca Giordano. 1701. Oil on canvas.",
+        "primary_quadrant": "Q3",
+        "quadrants": [
+          "Q3",
+          "Q1",
+          "Q4"
+        ],
+        "quadrant_ratios": {
+          "Q1": 0.20826863354037267,
+          "Q2": 0.02154503105590062,
+          "Q3": 0.6979813664596274,
+          "Q4": 0.07220496894409938
+        }
+      },
+      {
+        "crop_id": "436503_crop1",
+        "crop_path": "./data/crops/436503_crop1.jpg",
+        "crop_description": "The Flight into Egypt. Luca Giordano. 1701. Oil on canvas.",
+        "primary_quadrant": "Q2",
+        "quadrants": [
+          "Q2",
+          "Q1",
+          "Q4",
+          "Q3"
+        ],
+        "quadrant_ratios": {
+          "Q1": 0.280322548265132,
+          "Q2": 0.2842707531702747,
+          "Q3": 0.2161809482383645,
+          "Q4": 0.2192257503262288
+        }
+      },
+      {
+        "crop_id": "436503_crop2",
+        "crop_path": "./data/crops/436503_crop2.jpg",
+        "crop_description": "The Flight into Egypt. Luca Giordano. 1701. Oil on canvas.",
+        "primary_quadrant": "Q4",
+        "quadrants": [
+          "Q4",
+          "Q2",
+          "Q3",
+          "Q1"
+        ],
+        "quadrant_ratios": {
+          "Q1": 0.0716403162055336,
+          "Q2": 0.2325554879902706,
+          "Q3": 0.16386693017127799,
+          "Q4": 0.5319372656329178
+        }
+      }
+    ]
+  },
+  {
+    "full_image_id": 436504,
+    "full_image_description": "The Adoration of the Magi. Giotto di Bondone. possibly ca. 1320. Tempera on wood, gold ground.",
+    "image_path": "data/met_images/image_436504.jpg",
+    "crops": [
+      {
+        "crop_id": "436504_crop0",
+        "crop_path": "./data/crops/436504_crop0.jpg",
+        "crop_description": "Madonna and Child with Two Angels and a Donor. Giovanni di Paolo (Giovanni di Paolo di Grazia). ca. 1445. Tempera on wood, gold ground (partly checkered with modern red glazes).",
+        "primary_quadrant": "Q4",
+        "quadrants": [
+          "Q4",
+          "Q2"
+        ],
+        "quadrant_ratios": {
+          "Q1": 0.0,
+          "Q2": 0.16761363636363635,
+          "Q3": 0.0,
+          "Q4": 0.8323863636363636
+        }
+      },
+      {
+        "crop_id": "436504_crop1",
+        "crop_path": "./data/crops/436504_crop1.jpg",
+        "crop_description": "Diana the Huntress. Giampietrino (Giovanni Pietro Rizzoli). . Oil on wood.",
+        "primary_quadrant": "Q3",
+        "quadrants": [
+          "Q3",
+          "Q1"
+        ],
+        "quadrant_ratios": {
+          "Q1": 0.0875,
+          "Q2": 0.0,
+          "Q3": 0.9125,
+          "Q4": 0.0
+        }
+      },
+      {
+        "crop_id": "436504_crop2",
+        "crop_path": "./data/crops/436504_crop2.jpg",
+        "crop_description": "Portrait of a Man, Said to Be John Cecil (1628–1678), Fourth Earl of Exeter. Richard Gibson. ca. 1670. Vellum laid on card.",
+        "primary_quadrant": "Q4",
+        "quadrants": [
+          "Q4",
+          "Q3"
+        ],
+        "quadrant_ratios": {
+          "Q1": 0.0,
+          "Q2": 0.0,
+          "Q3": 0.36764705882352944,
+          "Q4": 0.6323529411764706
+        }
+      },
+      {
+        "crop_id": "436504_crop3",
+        "crop_path": "./data/crops/436504_crop3.jpg",
+        "crop_description": "Madonna and Child with Donors. Giovanni da Milano. ca. 1365. Tempera on wood, gold ground.",
+        "primary_quadrant": "Q4",
+        "quadrants": [
+          "Q4",
+          "Q2"
+        ],
+        "quadrant_ratios": {
+          "Q1": 0.0,
+          "Q2": 0.12462006079027356,
+          "Q3": 0.0,
+          "Q4": 0.8753799392097265
+        }
+      },
+      {
+        "crop_id": "436504_crop4",
+        "crop_path": "./data/crops/436504_crop4.jpg",
+        "crop_description": "Madonna and Child with Two Angels and a Donor. Giovanni di Paolo (Giovanni di Paolo di Grazia). ca. 1445. Tempera on wood, gold ground (partly checkered with modern red glazes).",
+        "primary_quadrant": "Q3",
+        "quadrants": [
+          "Q3"
+        ],
+        "quadrant_ratios": {
+          "Q1": 0.0,
+          "Q2": 0.0,
+          "Q3": 1.0,
+          "Q4": 0.0
+        }
+      }
+    ]
+  },
+  {
+    "full_image_id": 436506,
+    "full_image_description": "Madonna and Child with Donors. Giovanni da Milano. ca. 1365. Tempera on wood, gold ground.",
+    "image_path": "data/met_images/image_436506.jpg",
+    "crops": [
+      {
+        "crop_id": "436506_crop0",
+        "crop_path": "./data/crops/436506_crop0.jpg",
+        "crop_description": "Madonna and Child with Donors. Giovanni da Milano. ca. 1365. Tempera on wood, gold ground.",
+        "primary_quadrant": "Q4",
+        "quadrants": [
+          "Q4",
+          "Q2"
+        ],
+        "quadrant_ratios": {
+          "Q1": 0.0,
+          "Q2": 0.4010152284263959,
+          "Q3": 0.0,
+          "Q4": 0.5989847715736041
+        }
+      },
+      {
+        "crop_id": "436506_crop1",
+        "crop_path": "./data/crops/436506_crop1.jpg",
+        "crop_description": "Madonna and Child with Donors. Giovanni da Milano. ca. 1365. Tempera on wood, gold ground.",
+        "primary_quadrant": "Q1",
+        "quadrants": [
+          "Q1",
+          "Q3",
+          "Q2",
+          "Q4"
+        ],
+        "quadrant_ratios": {
+          "Q1": 0.3620689655172414,
+          "Q2": 0.13793103448275862,
+          "Q3": 0.3620689655172414,
+          "Q4": 0.13793103448275862
+        }
+      },
+      {
+        "crop_id": "436506_crop2",
+        "crop_path": "./data/crops/436506_crop2.jpg",
+        "crop_description": "Madonna and Child with Donors. Giovanni da Milano. ca. 1365. Tempera on wood, gold ground.",
+        "primary_quadrant": "Q4",
+        "quadrants": [
+          "Q4",
+          "Q2"
+        ],
+        "quadrant_ratios": {
+          "Q1": 0.0,
+          "Q2": 0.3389830508474576,
+          "Q3": 0.0,
+          "Q4": 0.6610169491525424
+        }
+      },
+      {
+        "crop_id": "436506_crop3",
+        "crop_path": "./data/crops/436506_crop3.jpg",
+        "crop_description": "Madonna and Child with Saints. Giovanni di Paolo (Giovanni di Paolo di Grazia). 1454. Tempera on wood, gold ground.",
+        "primary_quadrant": "Q3",
+        "quadrants": [
+          "Q3",
+          "Q1"
+        ],
+        "quadrant_ratios": {
+          "Q1": 0.31213872832369943,
+          "Q2": 0.0,
+          "Q3": 0.6878612716763006,
+          "Q4": 0.0
+        }
+      }
+    ]
+  },
+  {
+    "full_image_id": 436508,
+    "full_image_description": "Madonna and Child with Saints. Giovanni di Paolo (Giovanni di Paolo di Grazia). 1454. Tempera on wood, gold ground.",
+    "image_path": "data/met_images/image_436508.jpg",
+    "crops": [
+      {
+        "crop_id": "436508_crop0",
+        "crop_path": "./data/crops/436508_crop0.jpg",
+        "crop_description": "Madonna and Child with Saints. Giovanni di Paolo (Giovanni di Paolo di Grazia). 1454. Tempera on wood, gold ground.",
+        "primary_quadrant": "Q4",
+        "quadrants": [
+          "Q4",
+          "Q2"
+        ],
+        "quadrant_ratios": {
+          "Q1": 0.0,
+          "Q2": 0.3023952095808383,
+          "Q3": 0.0,
+          "Q4": 0.6976047904191617
+        }
+      },
+      {
+        "crop_id": "436508_crop1",
+        "crop_path": "./data/crops/436508_crop1.jpg",
+        "crop_description": "Madonna and Child with Two Angels and a Donor. Giovanni di Paolo (Giovanni di Paolo di Grazia). ca. 1445. Tempera on wood, gold ground (partly checkered with modern red glazes).",
+        "primary_quadrant": "Q4",
+        "quadrants": [
+          "Q4",
+          "Q2"
+        ],
+        "quadrant_ratios": {
+          "Q1": 0.0,
+          "Q2": 0.3123123123123123,
+          "Q3": 0.0,
+          "Q4": 0.6876876876876877
+        }
+      },
+      {
+        "crop_id": "436508_crop2",
+        "crop_path": "./data/crops/436508_crop2.jpg",
+        "crop_description": "Francesca Ghirardi Lechi (1773–1806). Giovanni Battista Gigola. . Ivory.",
+        "primary_quadrant": "Q3",
+        "quadrants": [
+          "Q3",
+          "Q1"
+        ],
+        "quadrant_ratios": {
+          "Q1": 0.30303030303030304,
+          "Q2": 0.0,
+          "Q3": 0.696969696969697,
+          "Q4": 0.0
+        }
+      },
+      {
+        "crop_id": "436508_crop3",
+        "crop_path": "./data/crops/436508_crop3.jpg",
+        "crop_description": "Madonna and Child with Donors. Giovanni da Milano. ca. 1365. Tempera on wood, gold ground.",
+        "primary_quadrant": "Q3",
+        "quadrants": [
+          "Q3",
+          "Q4",
+          "Q1",
+          "Q2"
+        ],
+        "quadrant_ratios": {
+          "Q1": 0.24078982242247549,
+          "Q2": 0.22859793267956532,
+          "Q3": 0.2721971905645375,
+          "Q4": 0.25841505433342166
+        }
+      },
+      {
+        "crop_id": "436508_crop4",
+        "crop_path": "./data/crops/436508_crop4.jpg",
+        "crop_description": "Madonna and Child with Saints. Giovanni di Paolo (Giovanni di Paolo di Grazia). 1454. Tempera on wood, gold ground.",
+        "primary_quadrant": "Q4",
+        "quadrants": [
+          "Q4"
+        ],
+        "quadrant_ratios": {
+          "Q1": 0.0,
+          "Q2": 0.0,
+          "Q3": 0.0,
+          "Q4": 1.0
+        }
+      },
+      {
+        "crop_id": "436508_crop5",
+        "crop_path": "./data/crops/436508_crop5.jpg",
+        "crop_description": "Madonna and Child with Saints. Giovanni di Paolo (Giovanni di Paolo di Grazia). 1454. Tempera on wood, gold ground.",
+        "primary_quadrant": "Q4",
+        "quadrants": [
+          "Q4"
+        ],
+        "quadrant_ratios": {
+          "Q1": 0.0,
+          "Q2": 0.0,
+          "Q3": 0.0,
+          "Q4": 1.0
+        }
+      },
+      {
+        "crop_id": "436508_crop6",
+        "crop_path": "./data/crops/436508_crop6.jpg",
+        "crop_description": "Madonna and Child with Saints. Giovanni di Paolo (Giovanni di Paolo di Grazia). 1454. Tempera on wood, gold ground.",
+        "primary_quadrant": "Q3",
+        "quadrants": [
+          "Q3"
+        ],
+        "quadrant_ratios": {
+          "Q1": 0.0,
+          "Q2": 0.0,
+          "Q3": 1.0,
+          "Q4": 0.0
+        }
+      }
+    ]
+  },
+  {
+    "full_image_id": 436509,
+    "full_image_description": "The Adoration of the Magi. Giovanni di Paolo (Giovanni di Paolo di Grazia). ca. 1460. Tempera and gold on wood.",
+    "image_path": "data/met_images/image_436509.jpg",
+    "crops": [
+      {
+        "crop_id": "436509_crop0",
+        "crop_path": "./data/crops/436509_crop0.jpg",
+        "crop_description": "Madonna and Child with Two Angels and a Donor. Giovanni di Paolo (Giovanni di Paolo di Grazia). ca. 1445. Tempera on wood, gold ground (partly checkered with modern red glazes).",
+        "primary_quadrant": "Q3",
+        "quadrants": [
+          "Q3",
+          "Q1"
+        ],
+        "quadrant_ratios": {
+          "Q1": 0.11607142857142858,
+          "Q2": 0.0,
+          "Q3": 0.8839285714285714,
+          "Q4": 0.0
+        }
+      },
+      {
+        "crop_id": "436509_crop1",
+        "crop_path": "./data/crops/436509_crop1.jpg",
+        "crop_description": "Madonna and Child with Two Angels and a Donor. Giovanni di Paolo (Giovanni di Paolo di Grazia). ca. 1445. Tempera on wood, gold ground (partly checkered with modern red glazes).",
+        "primary_quadrant": "Q3",
+        "quadrants": [
+          "Q3"
+        ],
+        "quadrant_ratios": {
+          "Q1": 0.0,
+          "Q2": 0.0,
+          "Q3": 1.0,
+          "Q4": 0.0
+        }
+      },
+      {
+        "crop_id": "436509_crop2",
+        "crop_path": "./data/crops/436509_crop2.jpg",
+        "crop_description": "Madonna and Child with Two Angels and a Donor. Giovanni di Paolo (Giovanni di Paolo di Grazia). ca. 1445. Tempera on wood, gold ground (partly checkered with modern red glazes).",
+        "primary_quadrant": "Q4",
+        "quadrants": [
+          "Q4",
+          "Q2",
+          "Q3",
+          "Q1"
+        ],
+        "quadrant_ratios": {
+          "Q1": 0.05657612393363689,
+          "Q2": 0.18694719212853927,
+          "Q3": 0.17574710838959542,
+          "Q4": 0.5807295755482283
+        }
+      },
+      {
+        "crop_id": "436509_crop3",
+        "crop_path": "./data/crops/436509_crop3.jpg",
+        "crop_description": "The Adoration of the Magi. Giovanni di Paolo (Giovanni di Paolo di Grazia). ca. 1460. Tempera and gold on wood.",
+        "primary_quadrant": "Q3",
+        "quadrants": [
+          "Q3"
+        ],
+        "quadrant_ratios": {
+          "Q1": 0.0,
+          "Q2": 0.0,
+          "Q3": 1.0,
+          "Q4": 0.0
+        }
+      },
+      {
+        "crop_id": "436509_crop4",
+        "crop_path": "./data/crops/436509_crop4.jpg",
+        "crop_description": "Madonna and Child with Saints. Giovanni di Paolo (Giovanni di Paolo di Grazia). 1454. Tempera on wood, gold ground.",
+        "primary_quadrant": "Q4",
+        "quadrants": [
+          "Q4"
+        ],
+        "quadrant_ratios": {
+          "Q1": 0.0,
+          "Q2": 0.0,
+          "Q3": 0.0,
+          "Q4": 1.0
+        }
+      }
+    ]
+  },
+  {
+    "full_image_id": 436510,
+    "full_image_description": "Madonna and Child with Two Angels and a Donor. Giovanni di Paolo (Giovanni di Paolo di Grazia). ca. 1445. Tempera on wood, gold ground (partly checkered with modern red glazes).",
+    "image_path": "data/met_images/image_436510.jpg",
+    "crops": [
+      {
+        "crop_id": "436510_crop0",
+        "crop_path": "./data/crops/436510_crop0.jpg",
+        "crop_description": "Madonna and Child with Two Angels and a Donor. Giovanni di Paolo (Giovanni di Paolo di Grazia). ca. 1445. Tempera on wood, gold ground (partly checkered with modern red glazes).",
+        "primary_quadrant": "Q1",
+        "quadrants": [
+          "Q1",
+          "Q2",
+          "Q3",
+          "Q4"
+        ],
+        "quadrant_ratios": {
+          "Q1": 0.3876042158250747,
+          "Q2": 0.2995123485921032,
+          "Q3": 0.1764983482774894,
+          "Q4": 0.1363850873053327
+        }
+      },
+      {
+        "crop_id": "436510_crop1",
+        "crop_path": "./data/crops/436510_crop1.jpg",
+        "crop_description": "Madonna and Child with Two Angels and a Donor. Giovanni di Paolo (Giovanni di Paolo di Grazia). ca. 1445. Tempera on wood, gold ground (partly checkered with modern red glazes).",
+        "primary_quadrant": "Q2",
+        "quadrants": [
+          "Q2",
+          "Q1",
+          "Q4",
+          "Q3"
+        ],
+        "quadrant_ratios": {
+          "Q1": 0.2927159796725014,
+          "Q2": 0.4085827216261999,
+          "Q3": 0.12467532467532468,
+          "Q4": 0.17402597402597403
+        }
+      }
+    ]
+  },
+  {
+    "full_image_id": 200001,
+    "full_image_description": "The Dance Class (무용수업). Edgar Degas. 1874. Oil on Canvas. French",
+    "image_path": "data/met_images/image_20001.jpg",
+    "crops": [
+      {
+        "crop_id": "200001_crop0",
+        "crop_path": "./data/crops/200001_crop0.jpg",
+        "crop_description": "오른쪽 뒤편, 교실 벽 쪽에서 차례를 기다리며 서 있거나 자세를 잡고 있는 무용수들.",
+        "primary_quadrant": "Q4",
+        "quadrants": [
+          "Q4",
+          "Q2"
+        ],
+        "quadrant_ratios": {
+          "Q1": 0.0,
+          "Q2": 0.4849931787175989,
+          "Q3": 0.0,
+          "Q4": 0.515006821282401
+        }
+      },
+      {
+        "crop_id": "200001_crop1",
+        "crop_path": "./data/crops/200001_crop1.jpg",
+        "crop_description": "전경에서 팔을 들어 올리고 포즈를 취하며 연습하는 발레리나의 모습.",
+        "primary_quadrant": "Q1",
+        "quadrants": [
+          "Q1",
+          "Q3"
+        ],
+        "quadrant_ratios": {
+          "Q1": 0.9268617021276596,
+          "Q2": 0.0,
+          "Q3": 0.07313829787234043,
+          "Q4": 0.0
+        }
+      },
+      {
+        "crop_id": "200001_crop2",
+        "crop_path": "./data/crops/200001_crop2.jpg",
+        "crop_description": "왼쪽 아래, 서로 이야기하거나 대기 중인 소녀들의 모습이 잡힌 부분.",
+        "primary_quadrant": "Q3",
+        "quadrants": [
+          "Q3",
+          "Q1"
+        ],
+        "quadrant_ratios": {
+          "Q1": 0.27814646490729744,
+          "Q2": 0.0008327738470278366,
+          "Q3": 0.7188684604658369,
+          "Q4": 0.002152300779837835
+        }
+      },
+      {
+        "crop_id": "200001_crop3",
+        "crop_path": "./data/crops/200001_crop3.jpg",
+        "crop_description": "창가 쪽에 기대 앉아 쉬고 있는 소녀와 교실 한쪽 구석의 분위기.",
+        "primary_quadrant": "Q2",
+        "quadrants": [
+          "Q2"
+        ],
+        "quadrant_ratios": {
+          "Q1": 0.0,
+          "Q2": 1.0,
+          "Q3": 0.0,
+          "Q4": 0.0
+        }
+      },
+      {
+        "crop_id": "200001_crop4",
+        "crop_path": "./data/crops/200001_crop4.jpg",
+        "crop_description": "교실 중앙 가까이에서 자세를 교정하며 발끝을 곧게 세우는 발레리나.",
+        "primary_quadrant": "Q2",
+        "quadrants": [
+          "Q2"
+        ],
+        "quadrant_ratios": {
+          "Q1": 0.0,
+          "Q2": 1.0,
+          "Q3": 0.0,
+          "Q4": 0.0
+        }
+      },
+      {
+        "crop_id": "200001_crop5",
+        "crop_path": "./data/crops/200001_crop5.jpg",
+        "crop_description": "지휘자의 지도를 받으며 팔과 어깨 라인을 곧게 펴고 연습하는 무용수.",
+        "primary_quadrant": "Q2",
+        "quadrants": [
+          "Q2",
+          "Q4"
+        ],
+        "quadrant_ratios": {
+          "Q1": 0.0,
+          "Q2": 0.5627329192546584,
+          "Q3": 0.0,
+          "Q4": 0.4372670807453416
+        }
+      },
+      {
+        "crop_id": "200001_crop6",
+        "crop_path": "./data/crops/200001_crop6.jpg",
+        "crop_description": "벽 쪽에 서서 순서를 기다리며 치마를 정리하는 발레 소녀들.",
+        "primary_quadrant": "Q2",
+        "quadrants": [
+          "Q2"
+        ],
+        "quadrant_ratios": {
+          "Q1": 0.0,
+          "Q2": 1.0,
+          "Q3": 0.0,
+          "Q4": 0.0
+        }
+      },
+      {
+        "crop_id": "200001_crop7",
+        "crop_path": "./data/crops/200001_crop7.jpg",
+        "crop_description": "연습을 마치고 서로 몸을 이완하며 이야기를 나누는 학생들의 장면.",
+        "primary_quadrant": "Q2",
+        "quadrants": [
+          "Q2",
+          "Q4"
+        ],
+        "quadrant_ratios": {
+          "Q1": 0.0,
+          "Q2": 0.6883988494726749,
+          "Q3": 0.0,
+          "Q4": 0.311601150527325
+        }
+      }
+    ]
+  },
+  {
+    "full_image_id": 200002,
+    "full_image_description": "Woman with a Parasol (양산을 쓴 여인). Claude Monet. 1875. Oil on Canvas. French",
+    "image_path": "data/met_images/image_20002.jpg",
+    "crops": [
+      {
+        "crop_id": "200002_crop0",
+        "crop_path": "./data/crops/200002_crop0.jpg",
+        "crop_description": "모네의 아내. 양산을 쓰고 푸른 드레스를 입고있다. 모네를 쳐다보고 있는것일까?",
+        "primary_quadrant": "Q2",
+        "quadrants": [
+          "Q2",
+          "Q4",
+          "Q1",
+          "Q3"
+        ],
+        "quadrant_ratios": {
+          "Q1": 0.21539706213151413,
+          "Q2": 0.40153263657723764,
+          "Q3": 0.1337465478816611,
+          "Q4": 0.2493237534095871
+        }
+      },
+      {
+        "crop_id": "200002_crop1",
+        "crop_path": "./data/crops/200002_crop1.jpg",
+        "crop_description": "모네의 아들. 노란색 모자를 쓰고 풀 속에 서있다.",
+        "primary_quadrant": "Q3",
+        "quadrants": [
+          "Q3"
+        ],
+        "quadrant_ratios": {
+          "Q1": 0.0,
+          "Q2": 0.0,
+          "Q3": 1.0,
+          "Q4": 0.0
+        }
+      }
+    ]
+  },
+  {
+    "full_image_id": 200003,
+    "full_image_description": "The Card Sharp with the Ace of Diamonds (다이아몬드 에이스를 가진 사기꾼). Georges de La Tour. 1630. Oil on Canvas. French",
+    "image_path": "data/met_images/image_20003.jpg",
+    "crops": [
+      {
+        "crop_id": "200003_crop0",
+        "crop_path": "./data/crops/200003_crop0.jpg",
+        "crop_description": "오른쪽 아래, 사기꾼이 허리춤에 숨긴 카드를 손등 뒤로 가리며 테이블 모서리를 스치듯 잡는 손놀림.",
+        "primary_quadrant": "Q4",
+        "quadrants": [
+          "Q4",
+          "Q2"
+        ],
+        "quadrant_ratios": {
+          "Q1": 0.0,
+          "Q2": 0.4392430278884462,
+          "Q3": 0.0,
+          "Q4": 0.5607569721115537
+        }
+      },
+      {
+        "crop_id": "200003_crop1",
+        "crop_path": "./data/crops/200003_crop1.jpg",
+        "crop_description": "오른쪽 상단, 화려한 복식의 여성이 곁눈질로 신호를 보내는 듯한 표정과 목선, 촛불빛이 만든 부드러운 하이라이트.",
+        "primary_quadrant": "Q2",
+        "quadrants": [
+          "Q2",
+          "Q4",
+          "Q1",
+          "Q3"
+        ],
+        "quadrant_ratios": {
+          "Q1": 0.15545150350184858,
+          "Q2": 0.380407765780966,
+          "Q3": 0.1346461255079143,
+          "Q4": 0.3294946052092711
+        }
+      },
+      {
+        "crop_id": "200003_crop2",
+        "crop_path": "./data/crops/200003_crop2.jpg",
+        "crop_description": "왼쪽 상단, 술잔을 든 청년의 얼굴과 어깨선—어둠 속에서 촛불이 비춰 만드는 강한 명암 대비.",
+        "quadrants": [
+          "Q1",
+          "Q3"
+        ],
+        "quadrant_ratios": {
+          "Q1": 0.503862660944206,
+          "Q2": 0.0,
+          "Q3": 0.496137339055794,
+          "Q4": 0.0
+        }
+      },
+      {
+        "crop_id": "200003_crop3",
+        "crop_path": "./data/crops/200003_crop3.jpg",
+        "crop_description": "왼편 인물의 손과 테이블 위 카드 더미가 맞닿는 순간—교체를 암시하는 미세한 손목의 각도.",
+        "primary_quadrant": "Q1",
+        "quadrants": [
+          "Q1",
+          "Q3"
+        ],
+        "quadrant_ratios": {
+          "Q1": 0.5326704545454546,
+          "Q2": 0.0,
+          "Q3": 0.46732954545454547,
+          "Q4": 0.0
+        }
+      },
+      {
+        "crop_id": "200003_crop4",
+        "crop_path": "./data/crops/200003_crop4.jpg",
+        "crop_description": "상단 왼쪽, 자수가 도드라진 소매와 카드가 만나는 지점—다이아몬드 에이스가 드러나기 직전의 긴장감.",
+        "primary_quadrant": "Q1",
+        "quadrants": [
+          "Q1",
+          "Q3"
+        ],
+        "quadrant_ratios": {
+          "Q1": 0.6157840083073728,
+          "Q2": 0.0,
+          "Q3": 0.3842159916926272,
+          "Q4": 0.0
+        }
+      }
+    ]
+  }
+]
