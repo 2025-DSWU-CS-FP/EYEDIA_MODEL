@@ -64,14 +64,14 @@ def push_painting_detected(painting_id : int):
         print(f"[WARN] WebSocket push 실패: {e}")
 
 # FastAPI 엔드포인트
-@app.post("/process-image/{painting_id}")
+@app.post("/process-image/{painting_id}") # Todo : Request Param /process-image?art_id=200001&q=Q1
 async def process_uploaded_image(painting_id : int = Path(..., ge=1)):
     try:
         # 메타데이터 백엔드 저장
         backend_payload = send_metadata_to_backend(painting_id)
 
         # WebSocket Push
-        push_painting_detected(painting_id)
+        push_painting_detected(painting_id, q) # q는 응시하는 영역 : null이면 백엔드에서 처리
 
         # 최종 FastAPI 응답
         return JSONResponse(content={**backend_payload, "result": "success"}, status_code=200)
