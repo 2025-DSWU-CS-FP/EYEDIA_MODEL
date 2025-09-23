@@ -12,7 +12,8 @@ from typing import Dict, Any, List
 
 load_dotenv()
 
-BACKEND_URL = os.getenv("BACKEND_URL", "http://43.202.177.63:8080")
+# BACKEND_URL = os.getenv("BACKEND_URL", "http://43.202.177.63:8080")
+BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8080")
 S3_URL = os.getenv("S3_URL", "https://s3-eyedia.s3.ap-northeast-2.amazonaws.com")
 FAISS_JSON_PATH = PPath("./data/faiss/met_structured_with_objects.json")  # 실제 경로로 조정
 
@@ -37,10 +38,10 @@ def _lookup_meta(painting_id: int | str):
     return idx.get(str(painting_id))
 
 # 백엔드: 메타데이터 저장 API 호출
-def send_metadata_to_backend(painting_id : int):
-    item = _lookup_meta(painting_id)
+def send_metadata_to_backend(art_id : int):
+    item = _lookup_meta(art_id)
     if not item:
-        raise ValueError(f"[send_metadata_to_backend] met_text_meta.json에서 ID {painting_id}를 찾을 수 없습니다.")
+        raise ValueError(f"[send_metadata_to_backend] met_text_meta.json에서 ID {art_id}를 찾을 수 없습니다.")
 
     payload = {
         "artId": int(item.get("artId") or item.get("id")),   # 백엔드가 camelCase(objectId) 기대한다고 가정
@@ -48,14 +49,14 @@ def send_metadata_to_backend(painting_id : int):
         "artist": item.get("artist"),
         "description": item.get("summary"),
         "exhibition": 1, # The_Met id, 하드코딩
-        "imageUrl": f"{S3_URL}/1/{painting_id}/{painting_id}"
+        "imageUrl": f"{S3_URL}/1/{art_id}/{art_id}"
     }
     
     url = f"{BACKEND_URL}/api/v1/paintings/save"
     print(f"[POST] {url}\nPayload: {json.dumps(payload, ensure_ascii=False, indent=2)}")
     resp = requests.post(url, json=payload, timeout=10)
     resp.raise_for_status()
-    return payload
+    print("✅ 백엔드 서버 DB 저장 성공")
 VALID_QUADS = {"Q1", "Q2", "Q3", "Q4"}
 
 @lru_cache(maxsize=1)
@@ -128,6 +129,7 @@ def push_painting_detected(painting_id : int):
         res = requests.post(f"{BACKEND_URL}/api/v1/events/detect", json=painting_id)
         res.raise_for_status()
         print("[✅] WebSocket push 성공")
+        return res.json()
     except Exception as e:
         print(f"[WARN] WebSocket push 실패: {e}")
 
@@ -184,17 +186,17 @@ async def process_uploaded_image(
 ):
     try:
         # 메타데이터 백엔드 저장
-        backend_payload = send_metadata_to_backend(painting_id)
+        send_metadata_to_backend(painting_id)
 
         # WebSocket Push
         if(q):
-            push_painting_area_detected(painting_id, q) # q1받아오도록 수정. 정해진 api 있음
+            backend_payload = push_painting_area_detected(painting_id, q) # q1받아오도록 수정. 정해진 api 있음
 
         else:
-            push_painting_detected(painting_id) # q1받아오도록 수정. 정해진 api 있음
+            backend_payload = push_painting_detected(painting_id) # q1받아오도록 수정. 정해진 api 있음
 
         # 최종 FastAPI 응답
-        return JSONResponse(content={**backend_payload, "result": "success"}, status_code=200)
+        return JSONResponse(backend_payload)
 
     except Exception as e:
         traceback.print_exc()
