@@ -12,8 +12,7 @@ from typing import Dict, Any, List
 
 load_dotenv()
 
-# BACKEND_URL = os.getenv("BACKEND_URL", "http://43.202.177.63:8080")
-BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8080")
+BACKEND_URL = os.getenv("BACKEND_URL", "http://43.202.177.63:8080")
 S3_URL = os.getenv("S3_URL", "https://s3-eyedia.s3.ap-northeast-2.amazonaws.com")
 FAISS_JSON_PATH = PPath("./data/faiss/met_structured_with_objects.json")  # 실제 경로로 조정
 
