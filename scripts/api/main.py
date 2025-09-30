@@ -48,7 +48,7 @@ def send_metadata_to_backend(art_id : int):
         "artist": item.get("artist"),
         "description": item.get("summary"),
         "exhibition": 1, # The_Met id, 하드코딩
-        "imageUrl": f"{S3_URL}/1/{art_id}/{art_id}"
+        "imageUrl": f"{S3_URL}/1/{art_id}/{art_id}.jpg"
     }
     
     url = f"{BACKEND_URL}/api/v1/paintings/save"
@@ -131,6 +131,7 @@ def push_painting_detected(painting_id : int):
         return res.json()
     except Exception as e:
         print(f"[WARN] WebSocket push 실패: {e}")
+        return res.json()
 
 # 백엔드: WebSocket Push용 엔드포인트 호출 - 영역 인식
 def push_painting_area_detected(painting_id: int, q: str | list[str] = None, top_k: int | None = None) -> bool:
@@ -171,11 +172,11 @@ def push_painting_area_detected(painting_id: int, q: str | list[str] = None, top
         res = requests.post(url, json=payload, timeout=10)
         res.raise_for_status()
         print(f"[✅] WebSocket push 성공: {url} (artId={painting_id}, q={q_list}, count={len(crops_all)})")
-        return True
+        return res.json()
 
     except Exception as e:
         print(f"[WARN] WebSocket push 실패: {e}")
-        return False
+        return res.json()
 
 # FastAPI 엔드포인트
 @app.post("/process-image")
@@ -184,14 +185,13 @@ async def process_uploaded_image(
     q: str | None = Query(None, alias="q")
 ):
     try:
-        # 메타데이터 백엔드 저장
-        send_metadata_to_backend(painting_id)
-
         # WebSocket Push
         if(q):
             backend_payload = push_painting_area_detected(painting_id, q) # q1받아오도록 수정. 정해진 api 있음
 
         else:
+            # 메타데이터 백엔드 저장
+            send_metadata_to_backend(painting_id)
             backend_payload = push_painting_detected(painting_id) # q1받아오도록 수정. 정해진 api 있음
 
         # 최종 FastAPI 응답
