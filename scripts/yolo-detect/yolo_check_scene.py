@@ -10,7 +10,7 @@ from ultralytics import YOLO
 from transformers import CLIPProcessor, CLIPModel
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"  # OpenMP 충돌 방지
 # ✅ YOLO 모델 로드 (세그멘테이션 또는 디텍션)
-yolo_model = YOLO("yolov8n-seg.pt")  # or yolov8n.pt if you want only detection
+yolo_model = YOLO("best.pt")  # or yolov8n.pt if you want only detection
 
 # ✅ CLIP 모델 로드
 clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
