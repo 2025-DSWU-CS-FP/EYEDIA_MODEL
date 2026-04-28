@@ -11,22 +11,22 @@ from PIL import Image
 from ultralytics import YOLO
 from transformers import CLIPProcessor, CLIPModel
 
-# ✅ YOLO 모델 로드
+# 1. YOLO 모델 로드
 yolo_model = YOLO("yolov8n.pt")  # yolov8n-seg.pt 도 가능
 
-# ✅ CLIP 모델 로드
+# 2. CLIP 모델 로드
 clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
 clip_processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
 
-# ✅ FAISS 인덱스 및 메타데이터 로드
+# 3. FAISS 인덱스 및 메타데이터 로드
 index = faiss.read_index("./data/faiss/met_text.index")
 with open("./data/faiss/met_structured_with_objects.json", "r", encoding="utf-8") as f:
     image_meta = json.load(f)
 
-# ✅ COCO 클래스 ID → 이름 매핑
+# 4. COCO 클래스 ID → 이름 매핑
 COCO_CLASSES = yolo_model.model.names
 
-# ✅ 그림 유사 클래스 목록 정의 (필요시 수정)
+# 5. 그림 유사 클래스 목록 정의 (필요시 수정)
 ART_CLASSES = ["tv", "book", "laptop", "cell phone", "remote", "keyboard", "monitor"]
 
 def embed_crop(image: np.ndarray):
@@ -36,7 +36,7 @@ def embed_crop(image: np.ndarray):
         embeddings = clip_model.get_image_features(**inputs)
     return embeddings[0].numpy()
 
-# ✅ 실시간 카메라 처리 시작
+# 6. 실시간 카메라 처리 시작
 cap = cv2.VideoCapture(0)
 
 while True:
@@ -69,7 +69,7 @@ while True:
         cv2.putText(frame, match_label, (x1, y1 - 10),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
 
-    cv2.imshow("🎨 Art-Like Detection + FAISS", frame)
+    cv2.imshow("Art-Like Detection + FAISS", frame)
     if cv2.waitKey(1) & 0xFF == ord("q"):
         break
 
